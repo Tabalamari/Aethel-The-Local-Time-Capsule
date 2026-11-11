@@ -5,6 +5,7 @@ import {
   LocationEntry,
   MediaFilterParams,
   MediaSnapshot,
+  SpotlightDTO,
   VaultStatus,
 } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -15,6 +16,9 @@ import { FutureLettersComponent } from '../letters/future-letters.component';
 import { AudioMapComponent } from '../map/audio-map.component';
 import { CommentsComponent } from '../comments/comments.component';
 import { DirectMessagesComponent } from '../direct-messages/direct-messages.component';
+import { SponsoredSpotlightComponent } from '../spotlight/sponsored-spotlight.component';
+import { PaymentComponent } from '../payment/payment.component';
+import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component';
 
 @Component({
   selector: 'app-home-feed',
@@ -28,6 +32,9 @@ import { DirectMessagesComponent } from '../direct-messages/direct-messages.comp
     AudioMapComponent,
     CommentsComponent,
     DirectMessagesComponent,
+    SponsoredSpotlightComponent,
+    PaymentComponent,
+    PartnerBadgeComponent,
   ],
   template: `
     <div class="space-y-10">
@@ -37,6 +44,9 @@ import { DirectMessagesComponent } from '../direct-messages/direct-messages.comp
         [vaultTitle]="vault()?.vault_title || 'Велика Капсула Часу Міста — 2030'"
         [vaultDescription]="vault()?.description || ''"
       ></app-vault-timer>
+
+      <!-- Stage 6: Sponsored Spotlight (Paid Featured Items) -->
+      <app-sponsored-spotlight (openPayment)="openPayment($event)"></app-sponsored-spotlight>
 
       <!-- Stage 3: Location Filter Bar -->
       <app-location-filter-bar
@@ -58,6 +68,9 @@ import { DirectMessagesComponent } from '../direct-messages/direct-messages.comp
             <div class="text-xs font-mono text-aethel-gold">
               ✓ Ви увійшли як &#64;{{ auth.profile()?.username || 'новий мешканець' }}
             </div>
+            @if (partnerBadge()?.partner_badge_label) {
+              <app-partner-badge [username]="auth.profile()?.username || null"></app-partner-badge>
+            }
             <p class="text-xs text-aethel-muted">
               Вам доступні ніки авторів, коментування, приватні повідомлення та завантаження медіа.
             </p>
@@ -158,11 +171,9 @@ import { DirectMessagesComponent } from '../direct-messages/direct-messages.comp
                       </span>
                     }
 
-                    @if (item.author_partner_badge) {
-                      <span class="text-[11px] px-2 py-0.5 rounded border border-aethel-amber/40 text-aethel-amber">
-                        {{ item.author_partner_badge }}
-                      </span>
-                    }
+                    <app-partner-badge
+                      [username]="item.author_username"
+                    ></app-partner-badge>
                   </div>
 
                   <!-- Interaction buttons for Registered vs Guest -->
@@ -201,6 +212,14 @@ import { DirectMessagesComponent } from '../direct-messages/direct-messages.comp
 
       <!-- Stage 5: Direct Messages Chat -->
       <app-direct-messages [autoOpen]="dmPartner()"></app-direct-messages>
+
+      <!-- Stage 6: Payment Modal -->
+      @if (paymentOpen()) {
+        <app-payment
+          [open]="paymentOpen()"
+          (close)="closePayment()"
+        ></app-payment>
+      }
     </div>
   `,
 })
@@ -212,14 +231,17 @@ export class HomeFeedComponent implements OnInit {
   readonly locations = signal<LocationEntry[]>([]);
   readonly snapshots = signal<MediaSnapshot[]>([]);
   readonly activeFilters = signal<MediaFilterParams>({});
+  readonly paymentOpen = signal<boolean>(false);
 
   readonly dmPartner = signal<{ username: string; id: string } | null>(null);
+  readonly partnerBadge = signal<{ username: string | null; partner_badge_label: string | null; role: string | null; is_partner: boolean } | null>(null);
 
   constructor() {
     // Automatically reload feed when auth token changes so nicknames appear/disappear immediately
     effect(() => {
       this.auth.accessToken();
       this.loadSnapshots();
+      this.loadPartnerBadge();
     });
   }
 
@@ -245,11 +267,27 @@ export class HomeFeedComponent implements OnInit {
     this.dmPartner.set({ username: authorUsername, id: authorUsername });
   }
 
+  openPayment(): void {
+    this.paymentOpen.set(true);
+  }
+
+  closePayment(): void {
+    this.paymentOpen.set(false);
+  }
+
   promptGuestAction(reason: string): void {
     this.auth.openAuthModal(reason);
   }
 
   private loadSnapshots(): void {
     this.api.getMediaSnapshots(this.activeFilters()).subscribe((items) => this.snapshots.set(items));
+  }
+
+  private loadPartnerBadge(): void {
+    if (!this.auth.isAuthenticated()) return;
+    this.api.getPartnerBadge().subscribe({
+      next: (data) => this.partnerBadge.set(data),
+      error: () => this.partnerBadge.set(null),
+    });
   }
 }

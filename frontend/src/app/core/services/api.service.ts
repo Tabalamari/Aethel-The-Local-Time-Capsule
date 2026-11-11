@@ -81,6 +81,36 @@ export interface DirectMessageDTO {
   receiver_username: string | null;
 }
 
+export interface SpotlightDTO {
+  id: string;
+  location_id: string;
+  location?: {
+    country: string;
+    city: string;
+    district: string;
+  };
+  media_url: string;
+  media_type: 'photo' | 'video' | 'audio';
+  captured_date: string;
+  caption?: string | null;
+  duration_seconds?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  is_spotlight: boolean;
+  spotlight_until?: string | null;
+  created_at: string;
+  author_username: string | null;
+  author_role: 'user' | 'partner_guardian' | null;
+  author_partner_badge?: string | null;
+}
+
+export interface PartnerBadgeDTO {
+  username: string | null;
+  partner_badge_label: string | null;
+  role: 'user' | 'partner_guardian' | null;
+  is_partner: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -168,5 +198,32 @@ export class ApiService {
     content: string;
   }): Observable<DirectMessageDTO> {
     return this.http.post<DirectMessageDTO>(`${this.baseUrl}/direct-messages`, payload);
+  }
+
+  getSpotlight(): Observable<SpotlightDTO[]> {
+    return this.http.get<SpotlightDTO[]>(`${this.baseUrl}/spotlight`);
+  }
+
+  setSpotlight(payload: {
+    media_id: string;
+    spotlight_until?: string | null;
+  }): Observable<{ success: boolean; media: SpotlightDTO }> {
+    return this.http.post<{ success: boolean; media: SpotlightDTO }>(
+      `${this.baseUrl}/spotlight`,
+      payload
+    );
+  }
+
+  getPartnerBadge(): Observable<PartnerBadgeDTO> {
+    return this.http.get<PartnerBadgeDTO>(`${this.baseUrl}/partner-badge`);
+  }
+
+  setPartnerBadge(payload: {
+    partner_badge_label: string | null;
+  }): Observable<{ success: boolean; username: string; partner_badge_label: string | null }> {
+    return this.http.post<{ success: boolean; username: string; partner_badge_label: string | null }>(
+      `${this.baseUrl}/partner-badge`,
+      payload
+    );
   }
 }

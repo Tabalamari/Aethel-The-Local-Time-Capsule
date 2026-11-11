@@ -901,3 +901,204 @@ apiRouter.post(
     res.status(201).json(created);
   }
 );
+
+// 12. Sponsored Spotlight - Get featured spotlighted media
+apiRouter.get(
+  '/spotlight',
+  async (_req: AuthenticatedRequest, res: Response) => {
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabaseAdmin
+        .from('media_items')
+        .select(
+          `
+          id,
+          location_id,
+          media_url,
+          media_type,
+          captured_date,
+          caption,
+          duration_seconds,
+          latitude,
+          longitude,
+          is_spotlight,
+          spotlight_until,
+          created_at,
+          locations!inner ( country, city, district ),
+          users ( username, role, partner_badge_label )
+        `
+        )
+        .eq('is_spotlight', true)
+        .order('spotlight_until', { ascending: false });
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      const isRegistered = Boolean(_req.viewer?.isRegistered);
+      const spotlights = (data || []).map((row: any) => ({
+        id: row.id,
+        location_id: row.location_id,
+        location: row.locations,
+        media_url: row.media_url,
+        media_type: row.media_type,
+        captured_date: row.captured_date,
+        caption: row.caption,
+        duration_seconds: row.duration_seconds,
+        latitude: row.latitude,
+        longitude: row.longitude,
+        is_spotlight: row.is_spotlight,
+        spotlight_until: row.spotlight_until,
+        created_at: row.created_at,
+        author_username: isRegistered ? row.users?.username ?? null : null,
+        author_role: isRegistered ? row.users?.role ?? null : null,
+        author_partner_badge: isRegistered ? row.users?.partner_badge_label ?? null : null,
+      }));
+
+      res.json(spotlights);
+      return;
+    }
+
+    // Demo mode - return empty, spotlight items are marked in seed data
+    res.json([]);
+  }
+);
+
+// 13. Sponsored Spotlight - Set media item as spotlight (paid feature)
+apiRouter.post(
+  '/spotlight',
+  requireRegisteredUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.viewer!.id;
+    const { media_id, spotlight_until } = req.body;
+
+    if (!media_id) {
+      res.status(400).json({
+        error: 'INVALID_SPOTLIGHT',
+        message: 'Потрібен параметр media_id.',
+      });
+      return;
+    }
+
+    if (isSupabaseConfigured) {
+      // Verify the media item belongs to the user
+      const { data: existing, error: fetchError } = await supabaseAdmin
+        .from('media_items')
+        .select('id, author_id')
+        .eq('id', media_id)
+        .maybeSingle();
+
+      if (fetchError || !existing) {
+        res.status(404).json({ error: 'MEDIA_NOT_FOUND' });
+        return;
+      }
+
+      if (existing.author_id !== userId) {
+        res.status(403).json({ error: 'NOT_MEDIA_OWNER' });
+        return;
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from('media_items')
+        .update({
+          is_spotlight: true,
+          spotlight_until: spotlight_until || null,
+        })
+        .eq('id', media_id)
+        .select('id, is_spotlight, spotlight_until')
+        .single();
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      res.json({ success: true, media: data });
+      return;
+    }
+
+    // Demo mode
+    res.json({ success: true, media: { id: media_id, is_spotlight: true, spotlight_until } });
+  }
+);
+
+// 14. Partner Badge - Get current user's badge
+apiRouter.get(
+  '/partner-badge',
+  requireRegisteredUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.viewer!.id;
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabaseAdmin
+        .from('users')
+        .select('username, partner_badge_label, role')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      if (!data) {
+        res.status(404).json({ error: 'USER_NOT_FOUND' });
+        return;
+      }
+
+      res.json({
+        username: data.username,
+        partner_badge_label: data.partner_badge_label,
+        role: data.role,
+        is_partner: Boolean(data.partner_badge_label),
+      });
+      return;
+    }
+
+    // Demo mode
+    res.json({
+      username: 'demo-user',
+      partner_badge_label: null,
+      role: 'user',
+      is_partner: false,
+    });
+  }
+);
+
+// 15. Partner Badge - Set/update partner badge (admin/partner feature)
+apiRouter.post(
+  '/partner-badge',
+  requireRegisteredUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.viewer!.id;
+    const { partner_badge_label } = req.body;
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabaseAdmin
+        .from('users')
+        .update({ partner_badge_label: partner_badge_label || null })
+        .eq('id', userId)
+        .select('id, username, partner_badge_label')
+        .single();
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      res.json({
+        success: true,
+        username: data.username,
+        partner_badge_label: data.partner_badge_label,
+      });
+      return;
+    }
+
+    // Demo mode
+    res.json({
+      success: true,
+      username: 'demo-user',
+      partner_badge_label: partner_badge_label || null,
+    });
+  }
+);
