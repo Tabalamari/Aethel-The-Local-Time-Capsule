@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import ws from 'ws';
 
 dotenv.config({ path: '../.env' });
 dotenv.config();
@@ -15,9 +16,11 @@ export const isSupabaseConfigured =
 
 export const supabaseAnon: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
   auth: { persistSession: false },
+  realtime: { transport: { WebSocket: ws } as any },
 });
 
 export const supabaseAdmin: SupabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
   auth: { persistSession: false },
+  realtime: { transport: { WebSocket: ws } as any },
 });
 
