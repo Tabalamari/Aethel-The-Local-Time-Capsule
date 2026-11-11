@@ -3,17 +3,26 @@ import { CommonModule } from '@angular/common';
 import {
   ApiService,
   LocationEntry,
+  MediaFilterParams,
   MediaSnapshot,
   VaultStatus,
 } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
+import { LocationFilterBarComponent } from '../locations/location-filter-bar.component';
 
 @Component({
   selector: 'app-home-feed',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LocationFilterBarComponent],
   template: `
     <div class="space-y-10">
+      <!-- Location Filter Bar (Stage 3: Геолокація та навігація) -->
+      <app-location-filter-bar
+        [locations]="locations()"
+        (filterChange)="onFilterChange($event)"
+        (locationAdded)="onLocationAdded($event)"
+      ></app-location-filter-bar>
+
       <!-- The Locked Vault Banner -->
       @if (vault(); as v) {
         <section class="p-6 rounded-xl border border-aethel-border bg-aethel-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -173,6 +182,7 @@ export class HomeFeedComponent implements OnInit {
   readonly vault = signal<VaultStatus | null>(null);
   readonly locations = signal<LocationEntry[]>([]);
   readonly snapshots = signal<MediaSnapshot[]>([]);
+  readonly activeFilters = signal<MediaFilterParams>({});
 
   constructor() {
     // Automatically reload feed when auth token changes so nicknames appear/disappear immediately
@@ -187,12 +197,21 @@ export class HomeFeedComponent implements OnInit {
     this.api.getLocations().subscribe((locs) => this.locations.set(locs));
   }
 
+  onFilterChange(filters: MediaFilterParams): void {
+    this.activeFilters.set(filters);
+    this.loadSnapshots();
+  }
+
+  onLocationAdded(location: LocationEntry): void {
+    this.locations.update((list) => [...list, location]);
+  }
+
   promptGuestAction(reason: string): void {
     this.auth.openAuthModal(reason);
   }
 
   private loadSnapshots(): void {
-    this.api.getMediaSnapshots().subscribe((items) => this.snapshots.set(items));
+    this.api.getMediaSnapshots(this.activeFilters()).subscribe((items) => this.snapshots.set(items));
   }
 }
 

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -16,6 +16,20 @@ export interface LocationEntry {
   country: string;
   city: string;
   district: string;
+}
+
+export interface CreateLocationPayload {
+  country: string;
+  city: string;
+  district: string;
+}
+
+export interface MediaFilterParams {
+  country?: string;
+  city?: string;
+  location_id?: string;
+  year?: string;
+  month?: string;
 }
 
 export interface MediaSnapshot {
@@ -49,12 +63,27 @@ export class ApiService {
     return this.http.get<LocationEntry[]>(`${this.baseUrl}/locations`);
   }
 
-  getMediaSnapshots(authToken?: string | null): Observable<MediaSnapshot[]> {
+  createLocation(payload: CreateLocationPayload): Observable<LocationEntry> {
+    return this.http.post<LocationEntry>(`${this.baseUrl}/locations`, payload);
+  }
+
+  getMediaSnapshots(
+    filters?: MediaFilterParams,
+    authToken?: string | null
+  ): Observable<MediaSnapshot[]> {
     let headers = new HttpHeaders();
     if (authToken) {
       headers = headers.set('Authorization', `Bearer ${authToken}`);
     }
-    return this.http.get<MediaSnapshot[]>(`${this.baseUrl}/media`, { headers });
+
+    let params = new HttpParams();
+    if (filters?.country) params = params.set('country', filters.country);
+    if (filters?.city) params = params.set('city', filters.city);
+    if (filters?.location_id) params = params.set('location_id', filters.location_id);
+    if (filters?.year) params = params.set('year', filters.year);
+    if (filters?.month) params = params.set('month', filters.month);
+
+    return this.http.get<MediaSnapshot[]>(`${this.baseUrl}/media`, { headers, params });
   }
 
   getMyArchive(): Observable<MediaSnapshot[]> {
