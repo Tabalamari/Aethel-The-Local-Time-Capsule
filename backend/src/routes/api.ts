@@ -220,6 +220,30 @@ apiRouter.get(
       res.json(data || []);
       return;
     }
+
+    const profile = localDemoProfiles.get(userId);
+    if (userId === 'demo-user-1' || profile?.username === 'podil_archivist') {
+      res.json([
+        {
+          id: 'snap-1',
+          location_id: 'loc-kyiv-podil',
+          location: { country: 'Україна', city: 'Київ', district: 'Поділ' },
+          media_url:
+            'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80',
+          media_type: 'photo',
+          captured_date: '2026-11-10',
+          caption: 'Ранковий туман над Контрактовою о 07:40 та перша кава біля трамвайної колії.',
+          is_spotlight: true,
+          created_at: new Date().toISOString(),
+          author_username: profile?.username || 'podil_archivist',
+          author_role: profile?.role || 'partner_guardian',
+          author_partner_badge:
+            profile?.partner_badge_label || 'Хранитель історії · Кав’ярня Світлиця',
+        },
+      ]);
+      return;
+    }
+
     res.json([]);
   }
 );

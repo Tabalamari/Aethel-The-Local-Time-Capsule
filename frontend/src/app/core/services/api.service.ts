@@ -56,5 +56,8 @@ export class ApiService {
     }
     return this.http.get<MediaSnapshot[]>(`${this.baseUrl}/media`, { headers });
   }
-}
 
+  getMyArchive(): Observable<MediaSnapshot[]> {
+    return this.http.get<MediaSnapshot[]>(`${this.baseUrl}/my-archive`);
+  }
+}
