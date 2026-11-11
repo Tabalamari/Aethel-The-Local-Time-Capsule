@@ -136,6 +136,7 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
                   [alt]="item.caption || 'Знімок міста'"
                   class="w-full h-full object-cover"
                   loading="lazy"
+                  decoding="async"
                 />
                 @if (item.is_spotlight) {
                   <span class="absolute top-3 left-3 text-[11px] font-mono uppercase px-2.5 py-1 rounded bg-aethel-amber text-aethel-bg font-semibold">

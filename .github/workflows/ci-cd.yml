@@ -1,0 +1,118 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, stage-*, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  BACKEND_DIR: backend
+  FRONTEND_DIR: frontend
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & TypeCheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install backend dependencies
+        run: npm install
+        working-directory: ${{ env.BACKEND_DIR }}
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+      - name: TypeCheck backend
+        run: npx tsc --noEmit
+        working-directory: ${{ env.BACKEND_DIR }}
+
+      - name: TypeCheck frontend
+        run: npx tsc --noEmit
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+  build:
+    name: Build
+    needs: lint-and-typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install backend dependencies
+        run: npm install
+        working-directory: ${{ env.BACKEND_DIR }}
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+      - name: Build backend
+        run: npm run build
+        working-directory: ${{ env.BACKEND_DIR }}
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+  deploy-backend:
+    name: Deploy Backend
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/stage-')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Render
+        run: |
+          echo "Deploying backend to Render..."
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+  deploy-frontend:
+    name: Deploy Frontend
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/stage-')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+      - name: Deploy to Vercel
+        run: |
+          echo "Deploying frontend to Vercel..."
+          npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --org ${{ secrets.VERCEL_ORG }} --project ${{ secrets.VERCEL_PROJECT }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG: ${{ secrets.VERCEL_ORG }}
+          VERCEL_PROJECT: ${{ secrets.VERCEL_PROJECT }}
