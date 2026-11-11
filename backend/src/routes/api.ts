@@ -588,7 +588,252 @@ apiRouter.post(
   }
 );
 
-// 7. Create Future Letter - Registered users only
+// 8. Get Comments for a Media Item - Public read
+apiRouter.get(
+  '/comments',
+  async (_req: AuthenticatedRequest, res: Response) => {
+    const { media_id } = _req.query;
+
+    if (!media_id || typeof media_id !== 'string') {
+      res.status(400).json({
+        error: 'INVALID_REQUEST',
+        message: 'Потрібен параметр media_id.',
+      });
+      return;
+    }
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabaseAdmin
+        .from('comments')
+        .select('*, users ( username )')
+        .eq('media_id', media_id)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      const isRegistered = Boolean(_req.viewer?.isRegistered);
+      const comments = (data || []).map((row: any) => ({
+        id: row.id,
+        media_id: row.media_id,
+        author_id: row.author_id,
+        content: row.content,
+        created_at: row.created_at,
+        author_username: isRegistered ? row.users?.username ?? null : null,
+      }));
+
+      res.json(comments);
+      return;
+    }
+
+    // Demo mode
+    res.json([]);
+  }
+);
+
+// 9. Create a Comment - Registered users only
+apiRouter.post(
+  '/comments',
+  requireRegisteredUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.viewer!.id;
+    const { media_id, content } = req.body;
+
+    if (!media_id || !content || String(content).trim().length === 0) {
+      res.status(400).json({
+        error: 'INVALID_COMMENT',
+        message: 'Потрібні поля: media_id та вміст коментаря.',
+      });
+      return;
+    }
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabaseAdmin
+        .from('comments')
+        .insert({
+          media_id,
+          author_id: userId,
+          content: content.trim(),
+        })
+        .select('*, users ( username )')
+        .single();
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      const isRegistered = Boolean(req.viewer?.isRegistered);
+      const comment: CommentDTO = {
+        id: data.id,
+        media_id: data.media_id,
+        author_id: data.author_id,
+        content: data.content,
+        created_at: data.created_at,
+        author_username: isRegistered ? data.users?.username ?? null : null,
+      };
+
+      res.status(201).json(comment);
+      return;
+    }
+
+    // Demo mode
+    const created: CommentDTO = {
+      id: `comment-demo-${Date.now()}`,
+      media_id,
+      author_id: userId,
+      content: content.trim(),
+      created_at: new Date().toISOString(),
+      author_username: 'demo-user',
+    };
+
+    res.status(201).json(created);
+  }
+);
+
+// 10. Get Direct Messages between two users - Participants only
+apiRouter.get(
+  '/direct-messages',
+  requireRegisteredUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.viewer!.id;
+    const { with: otherUserId } = req.query;
+
+    if (!otherUserId || typeof otherUserId !== 'string') {
+      res.status(400).json({
+        error: 'INVALID_REQUEST',
+        message: 'Потрібен параметр with (нік або ID собесіра).',
+      });
+      return;
+    }
+
+    if (isSupabaseConfigured) {
+      // Resolve other user by username if it looks like a username
+      let targetUserId = otherUserId;
+      if (!otherUserId.includes('-')) {
+        const { data: userData, error: userError } = await supabaseAdmin
+          .from('users')
+          .select('id')
+          .ilike('username', otherUserId)
+          .maybeSingle();
+
+        if (userError || !userData) {
+          res.status(404).json({
+            error: 'USER_NOT_FOUND',
+            message: 'Користувача не знайдено.',
+          });
+          return;
+        }
+        targetUserId = userData.id;
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from('direct_messages')
+        .select('*, senders:users!sender_id ( username ), receivers:users!receiver_id ( username )')
+        .or(`and(sender_id.eq.${userId},receiver_id.eq.${targetUserId}),and(sender_id.eq.${targetUserId},receiver_id.eq.${userId})`)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      const isRegistered = Boolean(req.viewer?.isRegistered);
+      const messages = (data || []).map((row: any) => ({
+        id: row.id,
+        sender_id: row.sender_id,
+        receiver_id: row.receiver_id,
+        content: row.content,
+        is_read: row.is_read,
+        created_at: row.created_at,
+        sender_username: isRegistered ? row.senders?.username ?? null : null,
+        receiver_username: isRegistered ? row.receivers?.username ?? null : null,
+      }));
+
+      res.json(messages);
+      return;
+    }
+
+    // Demo mode
+    res.json([]);
+  }
+);
+
+// 11. Send a Direct Message - Registered users only
+apiRouter.post(
+  '/direct-messages',
+  requireRegisteredUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const senderId = req.viewer!.id;
+    const { receiver_id, content } = req.body;
+
+    if (!receiver_id || !content || String(content).trim().length === 0) {
+      res.status(400).json({
+        error: 'INVALID_MESSAGE',
+        message: 'Потрібні поля: receiver_id та вміст повідомлення.',
+      });
+      return;
+    }
+
+    if (senderId === receiver_id) {
+      res.status(400).json({
+        error: 'CANNOT_MESSAGE_SELF',
+        message: 'Неможливо надіслати повідомлення собі.',
+      });
+      return;
+    }
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabaseAdmin
+        .from('direct_messages')
+        .insert({
+          sender_id: senderId,
+          receiver_id,
+          content: content.trim(),
+        })
+        .select(
+          '*, senders:users!sender_id ( username ), receivers:users!receiver_id ( username )'
+        )
+        .single();
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      const isRegistered = Boolean(req.viewer?.isRegistered);
+      const message: DirectMessageDTO = {
+        id: data.id,
+        sender_id: data.sender_id,
+        receiver_id: data.receiver_id,
+        content: data.content,
+        is_read: data.is_read,
+        created_at: data.created_at,
+        sender_username: isRegistered ? data.senders?.username ?? null : null,
+        receiver_username: isRegistered ? data.receivers?.username ?? null : null,
+      };
+
+      res.status(201).json(message);
+      return;
+    }
+
+    // Demo mode
+    const created: DirectMessageDTO = {
+      id: `dm-demo-${Date.now()}`,
+      sender_id: senderId,
+      receiver_id,
+      content: content.trim(),
+      is_read: false,
+      created_at: new Date().toISOString(),
+      sender_username: 'demo-user',
+      receiver_username: null,
+    };
+
+    res.status(201).json(created);
+  }
+);
 apiRouter.post(
   '/future-letters',
   requireRegisteredUser,

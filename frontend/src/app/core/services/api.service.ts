@@ -61,6 +61,26 @@ export interface FutureLetterDTO {
   author_username: string | null;
 }
 
+export interface CommentDTO {
+  id: string;
+  media_id: string;
+  author_id: string;
+  content: string;
+  created_at: string;
+  author_username: string | null;
+}
+
+export interface DirectMessageDTO {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+  sender_username: string | null;
+  receiver_username: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -125,5 +145,28 @@ export class ApiService {
 
   getMyArchive(): Observable<MediaSnapshot[]> {
     return this.http.get<MediaSnapshot[]>(`${this.baseUrl}/my-archive`);
+  }
+
+  getComments(mediaId: string): Observable<CommentDTO[]> {
+    return this.http.get<CommentDTO[]>(`${this.baseUrl}/comments`, {
+      params: { media_id: mediaId },
+    });
+  }
+
+  createComment(payload: { media_id: string; content: string }): Observable<CommentDTO> {
+    return this.http.post<CommentDTO>(`${this.baseUrl}/comments`, payload);
+  }
+
+  getDirectMessages(otherUserId: string): Observable<DirectMessageDTO[]> {
+    return this.http.get<DirectMessageDTO[]>(`${this.baseUrl}/direct-messages`, {
+      params: { with: otherUserId },
+    });
+  }
+
+  sendDirectMessage(payload: {
+    receiver_id: string;
+    content: string;
+  }): Observable<DirectMessageDTO> {
+    return this.http.post<DirectMessageDTO>(`${this.baseUrl}/direct-messages`, payload);
   }
 }

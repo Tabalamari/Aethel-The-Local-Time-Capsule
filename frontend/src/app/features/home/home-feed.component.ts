@@ -13,6 +13,8 @@ import { VaultTimerComponent } from './vault-timer.component';
 import { MediaUploadComponent } from '../upload/media-upload.component';
 import { FutureLettersComponent } from '../letters/future-letters.component';
 import { AudioMapComponent } from '../map/audio-map.component';
+import { CommentsComponent } from '../comments/comments.component';
+import { DirectMessagesComponent } from '../direct-messages/direct-messages.component';
 
 @Component({
   selector: 'app-home-feed',
@@ -24,6 +26,8 @@ import { AudioMapComponent } from '../map/audio-map.component';
     MediaUploadComponent,
     FutureLettersComponent,
     AudioMapComponent,
+    CommentsComponent,
+    DirectMessagesComponent,
   ],
   template: `
     <div class="space-y-10">
@@ -141,9 +145,13 @@ import { AudioMapComponent } from '../map/audio-map.component';
                 <div class="pt-3 border-t border-aethel-border space-y-3">
                   <div class="flex items-center justify-between text-xs">
                     @if (item.author_username) {
-                      <span class="font-mono text-aethel-gold">
+                      <button
+                        type="button"
+                        (click)="openDM(item.author_username)"
+                        class="font-mono font-semibold text-aethel-gold hover:underline transition"
+                      >
                         &#64;{{ item.author_username }}
-                      </span>
+                      </button>
                     } @else {
                       <span class="font-mono text-aethel-muted italic">
                         Анонімний мешканець (нік приховано для гостей)
@@ -160,9 +168,11 @@ import { AudioMapComponent } from '../map/audio-map.component';
                   <!-- Interaction buttons for Registered vs Guest -->
                   <div class="flex items-center justify-between pt-1">
                     @if (auth.isAuthenticated()) {
-                      <span class="text-[11px] font-mono text-aethel-muted">
-                        💬 Залишити коментар · ✉ Написати автору в DM
-                      </span>
+                      <div class="flex items-center gap-3">
+                        <span class="text-[11px] font-mono text-aethel-muted">
+                          💬 Коментарі · ✉ DM
+                        </span>
+                      </div>
                     } @else {
                       <button
                         type="button"
@@ -175,6 +185,9 @@ import { AudioMapComponent } from '../map/audio-map.component';
                   </div>
                 </div>
               </div>
+
+              <!-- Stage 5: Comments under each media item -->
+              <app-comments [mediaId]="item.id"></app-comments>
             </article>
           }
         </div>
@@ -185,6 +198,9 @@ import { AudioMapComponent } from '../map/audio-map.component';
 
       <!-- Stage 4: Audio-Geotagging Map -->
       <app-audio-map></app-audio-map>
+
+      <!-- Stage 5: Direct Messages Chat -->
+      <app-direct-messages [autoOpen]="dmPartner()"></app-direct-messages>
     </div>
   `,
 })
@@ -196,6 +212,8 @@ export class HomeFeedComponent implements OnInit {
   readonly locations = signal<LocationEntry[]>([]);
   readonly snapshots = signal<MediaSnapshot[]>([]);
   readonly activeFilters = signal<MediaFilterParams>({});
+
+  readonly dmPartner = signal<{ username: string; id: string } | null>(null);
 
   constructor() {
     // Automatically reload feed when auth token changes so nicknames appear/disappear immediately
@@ -221,6 +239,10 @@ export class HomeFeedComponent implements OnInit {
 
   onMediaUploaded(snapshot: MediaSnapshot): void {
     this.snapshots.update((list) => [snapshot, ...list]);
+  }
+
+  openDM(authorUsername: string): void {
+    this.dmPartner.set({ username: authorUsername, id: authorUsername });
   }
 
   promptGuestAction(reason: string): void {
