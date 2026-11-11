@@ -9,36 +9,43 @@ import {
 } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { LocationFilterBarComponent } from '../locations/location-filter-bar.component';
+import { VaultTimerComponent } from './vault-timer.component';
+import { MediaUploadComponent } from '../upload/media-upload.component';
+import { FutureLettersComponent } from '../letters/future-letters.component';
+import { AudioMapComponent } from '../map/audio-map.component';
 
 @Component({
   selector: 'app-home-feed',
   standalone: true,
-  imports: [CommonModule, LocationFilterBarComponent],
+  imports: [
+    CommonModule,
+    LocationFilterBarComponent,
+    VaultTimerComponent,
+    MediaUploadComponent,
+    FutureLettersComponent,
+    AudioMapComponent,
+  ],
   template: `
     <div class="space-y-10">
-      <!-- Location Filter Bar (Stage 3: Геолокація та навігація) -->
+      <!-- Stage 4: Locked Vault & Countdown Timer -->
+      <app-vault-timer
+        [unlockAt]="vault()?.unlock_at || ''"
+        [vaultTitle]="vault()?.vault_title || 'Велика Капсула Часу Міста — 2030'"
+        [vaultDescription]="vault()?.description || ''"
+      ></app-vault-timer>
+
+      <!-- Stage 3: Location Filter Bar -->
       <app-location-filter-bar
         [locations]="locations()"
         (filterChange)="onFilterChange($event)"
         (locationAdded)="onLocationAdded($event)"
       ></app-location-filter-bar>
 
-      <!-- The Locked Vault Banner -->
-      @if (vault(); as v) {
-        <section class="p-6 rounded-xl border border-aethel-border bg-aethel-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-aethel-amber">
-              <span>🔒 Замкнений сейф спогадів</span>
-            </div>
-            <h2 class="text-xl font-serif text-aethel-cream">{{ v.vault_title }}</h2>
-            <p class="text-sm text-aethel-muted max-w-xl">{{ v.description }}</p>
-          </div>
-          <div class="text-right font-mono bg-aethel-bg px-5 py-3 rounded-lg border border-aethel-border">
-            <div class="text-xs text-aethel-muted uppercase">Відкриття капсули</div>
-            <div class="text-lg text-aethel-gold font-semibold">{{ v.unlock_at | date: 'yyyy-MM-dd' }}</div>
-          </div>
-        </section>
-      }
+      <!-- Stage 4: Media Upload -->
+      <app-media-upload
+        [locations]="locations()"
+        (uploadComplete)="onMediaUploaded($event)"
+      ></app-media-upload>
 
       <!-- Guest vs Registered Role Action Bar -->
       <section class="p-4 rounded-xl border border-aethel-border bg-aethel-surface/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -172,6 +179,12 @@ import { LocationFilterBarComponent } from '../locations/location-filter-bar.com
           }
         </div>
       </section>
+
+      <!-- Stage 4: Future Letters -->
+      <app-future-letters [locations]="locations()"></app-future-letters>
+
+      <!-- Stage 4: Audio-Geotagging Map -->
+      <app-audio-map></app-audio-map>
     </div>
   `,
 })
@@ -206,6 +219,10 @@ export class HomeFeedComponent implements OnInit {
     this.locations.update((list) => [...list, location]);
   }
 
+  onMediaUploaded(snapshot: MediaSnapshot): void {
+    this.snapshots.update((list) => [snapshot, ...list]);
+  }
+
   promptGuestAction(reason: string): void {
     this.auth.openAuthModal(reason);
   }
@@ -214,4 +231,3 @@ export class HomeFeedComponent implements OnInit {
     this.api.getMediaSnapshots(this.activeFilters()).subscribe((items) => this.snapshots.set(items));
   }
 }
-

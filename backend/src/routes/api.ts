@@ -481,3 +481,178 @@ apiRouter.get('/future-letters', async (req: AuthenticatedRequest, res: Response
 
   res.json(demoLetters);
 });
+
+// 6. Upload Media (Daily Snapshot / Audio Map point) - Registered users only
+apiRouter.post(
+  '/media',
+  requireRegisteredUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.viewer!.id;
+    const {
+      location_id,
+      media_url,
+      media_type,
+      captured_date,
+      caption,
+      latitude,
+      longitude,
+      is_spotlight,
+    } = req.body;
+
+    if (!location_id || !media_url || !media_type || !captured_date) {
+      res.status(400).json({
+        error: 'INVALID_MEDIA',
+        message: 'Потрібні поля: локація, медіафайл, тип і дата знімка.',
+      });
+      return;
+    }
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabaseAdmin
+        .from('media_items')
+        .insert({
+          author_id: userId,
+          location_id,
+          media_url,
+          media_type,
+          captured_date,
+          caption: caption || null,
+          latitude: latitude || null,
+          longitude: longitude || null,
+          is_spotlight: Boolean(is_spotlight),
+        })
+        .select(
+          `
+          id,
+          location_id,
+          media_url,
+          media_type,
+          captured_date,
+          caption,
+          duration_seconds,
+          latitude,
+          longitude,
+          is_spotlight,
+          created_at,
+          locations!inner ( country, city, district ),
+          users ( username, role, partner_badge_label )
+        `
+        )
+        .single();
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      const isRegistered = Boolean(req.viewer?.isRegistered);
+      const sanitized: MediaItemDTO = {
+        id: data.id,
+        location_id: data.location_id,
+        location: data.locations,
+        media_url: data.media_url,
+        media_type: data.media_type,
+        captured_date: data.captured_date,
+        caption: data.caption,
+        duration_seconds: data.duration_seconds,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        is_spotlight: data.is_spotlight,
+        created_at: data.created_at,
+        author_username: isRegistered ? data.users?.username ?? null : null,
+        author_role: isRegistered ? data.users?.role ?? null : null,
+        author_partner_badge: isRegistered ? data.users?.partner_badge_label ?? null : null,
+      };
+
+      res.status(201).json(sanitized);
+      return;
+    }
+
+    // Demo mode
+    const created: MediaItemDTO = {
+      id: `snap-demo-${Date.now()}`,
+      location_id,
+      media_url,
+      media_type: media_type as MediaItemDTO['media_type'],
+      captured_date,
+      caption: caption || null,
+      latitude: latitude || null,
+      longitude: longitude || null,
+      is_spotlight: Boolean(is_spotlight),
+      created_at: new Date().toISOString(),
+      author_username: 'demo-user',
+      author_role: 'user',
+      author_partner_badge: null,
+    };
+    res.status(201).json(created);
+  }
+);
+
+// 7. Create Future Letter - Registered users only
+apiRouter.post(
+  '/future-letters',
+  requireRegisteredUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.viewer!.id;
+    const { location_id, title, content, unlock_date } = req.body;
+
+    if (!location_id || !title || !content || !unlock_date) {
+      res.status(400).json({
+        error: 'INVALID_LETTER',
+        message: 'Потрібні поля: локація, заголовок, текст і дата відкриття.',
+      });
+      return;
+    }
+
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const isUnlocked = unlock_date <= todayIso;
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabaseAdmin
+        .from('future_letters')
+        .insert({
+          author_id: userId,
+          location_id,
+          title,
+          content,
+          unlock_date,
+        })
+        .select('id, location_id, title, content, unlock_date, created_at, users ( username )')
+        .single();
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+
+      const isRegistered = Boolean(req.viewer?.isRegistered);
+      const letter: FutureLetterDTO = {
+        id: data.id,
+        location_id: data.location_id,
+        title: data.title,
+        content: isUnlocked ? data.content : null,
+        unlock_date: data.unlock_date,
+        is_unlocked: isUnlocked,
+        created_at: data.created_at,
+        author_username: isRegistered ? data.users?.username ?? null : null,
+      };
+
+      res.status(201).json(letter);
+      return;
+    }
+
+    // Demo mode
+    const created: FutureLetterDTO = {
+      id: `letter-demo-${Date.now()}`,
+      location_id,
+      title,
+      content: isUnlocked ? content : null,
+      unlock_date,
+      is_unlocked: isUnlocked,
+      created_at: new Date().toISOString(),
+      author_username: 'demo-user',
+    };
+
+    res.status(201).json(created);
+  }
+);

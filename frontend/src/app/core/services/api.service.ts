@@ -50,10 +50,21 @@ export interface MediaSnapshot {
   author_partner_badge?: string | null;
 }
 
+export interface FutureLetterDTO {
+  id: string;
+  location_id: string;
+  title: string;
+  content: string | null;
+  unlock_date: string;
+  is_unlocked: boolean;
+  created_at: string;
+  author_username: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = environment.apiUrl;
+  readonly baseUrl = environment.apiUrl;
 
   getVaultStatus(): Observable<VaultStatus> {
     return this.http.get<VaultStatus>(`${this.baseUrl}/vault`);
@@ -65,6 +76,32 @@ export class ApiService {
 
   createLocation(payload: CreateLocationPayload): Observable<LocationEntry> {
     return this.http.post<LocationEntry>(`${this.baseUrl}/locations`, payload);
+  }
+
+  createMedia(payload: {
+    location_id: string;
+    media_url: string;
+    media_type: 'photo' | 'video' | 'audio';
+    captured_date: string;
+    caption?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    is_spotlight?: boolean;
+  }): Observable<MediaSnapshot> {
+    return this.http.post<MediaSnapshot>(`${this.baseUrl}/media`, payload);
+  }
+
+  createFutureLetter(payload: {
+    location_id: string;
+    title: string;
+    content: string;
+    unlock_date: string;
+  }): Observable<FutureLetterDTO> {
+    return this.http.post<FutureLetterDTO>(`${this.baseUrl}/future-letters`, payload);
+  }
+
+  getFutureLetters(): Observable<FutureLetterDTO[]> {
+    return this.http.get<FutureLetterDTO[]>(`${this.baseUrl}/future-letters`);
   }
 
   getMediaSnapshots(
