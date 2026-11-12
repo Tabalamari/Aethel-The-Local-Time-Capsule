@@ -37,7 +37,7 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
     PartnerBadgeComponent,
   ],
   template: `
-    <div class="space-y-16">
+    <div class="space-y-32">
       <!-- Stage 4: Locked Vault & Countdown Timer -->
       <app-vault-timer
         [unlockAt]="vault()?.unlock_at || ''"
