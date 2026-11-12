@@ -16,8 +16,9 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <section class="p-6 rounded-xl border border-aethel-upload bg-aethel-surface space-y-5">
-      <div class="flex items-start justify-between gap-4">
+    <section class="p-8 rounded-xl border border-aethel-upload bg-aethel-surface space-y-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span class="text-xs font-mono uppercase tracking-widest text-aethel-upload">
             Adding Memory
@@ -40,14 +41,30 @@ import { AuthService } from '../../core/services/auth.service';
             (click)="promptGuest()"
             class="text-xs font-mono px-3 py-1.5 rounded border border-aethel-upload/60 text-aethel-upload hover:bg-aethel-upload hover:text-aethel-bg transition"
           >
-            + Upload (Sign In)
+            + Add Media (Sign In)
           </button>
         }
       </div>
 
+      <!-- Guest Mode Notice -->
+      @if (!auth.isAuthenticated()) {
+        <div class="p-5 rounded-lg border border-aethel-upload/30 bg-aethel-bg/30 flex items-start gap-4">
+          <span class="text-aethel-muted text-sm">👁</span>
+          <div>
+            <div class="text-xs font-mono text-aethel-muted">
+              Guest Mode · Author nicknames hidden for privacy protection
+            </div>
+            <p class="text-xs text-aethel-muted leading-relaxed">
+              Sign in with 1 click to see authors, leave comments and add your own memories.
+            </p>
+          </div>
+        </div>
+      }
+
+      <!-- Upload Form (Registered users only) -->
       @if (isOpen() && auth.isAuthenticated()) {
-        <form (ngSubmit)="onSubmit()" class="space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <form (ngSubmit)="onSubmit()" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-3">
             <div class="col-span-2 sm:col-span-1">
               <label class="block text-xs font-mono text-aethel-muted mb-1.5">
                 Media File (photo or video)
@@ -124,9 +141,9 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
 
           <div>
-<label class="block text-xs font-mono text-aethel-muted mb-1.5">
-                Caption (optional)
-              </label>
+            <label class="block text-xs font-mono text-aethel-muted mb-1.5">
+              Caption (optional)
+            </label>
             <textarea
               [(ngModel)]="caption"
               name="caption"
@@ -167,9 +184,10 @@ export class MediaUploadComponent {
   get locations() {
     return this._locations();
   }
-  private readonly _locations = signal<LocationEntry[]>([]);
 
   @Output() readonly uploadComplete = new EventEmitter<MediaSnapshot>();
+
+  private readonly _locations = signal<LocationEntry[]>([]);
 
   readonly isOpen = signal(false);
   readonly isUploading = signal(false);
