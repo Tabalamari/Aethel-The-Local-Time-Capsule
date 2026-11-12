@@ -7,3 +7,7 @@ dist/
 !.env.example
 .DS_Store
 *.log
+.PRD.md
+.tasks.md
+
+

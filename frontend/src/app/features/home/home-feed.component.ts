@@ -3,33 +3,63 @@ import { CommonModule } from '@angular/common';
 import {
   ApiService,
   LocationEntry,
+  MediaFilterParams,
   MediaSnapshot,
+  SpotlightDTO,
   VaultStatus,
 } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
+import { LocationFilterBarComponent } from '../locations/location-filter-bar.component';
+import { VaultTimerComponent } from './vault-timer.component';
+import { MediaUploadComponent } from '../upload/media-upload.component';
+import { FutureLettersComponent } from '../letters/future-letters.component';
+import { AudioMapComponent } from '../map/audio-map.component';
+import { CommentsComponent } from '../comments/comments.component';
+import { DirectMessagesComponent } from '../direct-messages/direct-messages.component';
+import { SponsoredSpotlightComponent } from '../spotlight/sponsored-spotlight.component';
+import { PaymentComponent } from '../payment/payment.component';
+import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component';
 
 @Component({
   selector: 'app-home-feed',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    LocationFilterBarComponent,
+    VaultTimerComponent,
+    MediaUploadComponent,
+    FutureLettersComponent,
+    AudioMapComponent,
+    CommentsComponent,
+    DirectMessagesComponent,
+    SponsoredSpotlightComponent,
+    PaymentComponent,
+    PartnerBadgeComponent,
+  ],
   template: `
     <div class="space-y-10">
-      <!-- The Locked Vault Banner -->
-      @if (vault(); as v) {
-        <section class="p-6 rounded-xl border border-aethel-border bg-aethel-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-aethel-amber">
-              <span>🔒 Замкнений сейф спогадів</span>
-            </div>
-            <h2 class="text-xl font-serif text-aethel-cream">{{ v.vault_title }}</h2>
-            <p class="text-sm text-aethel-muted max-w-xl">{{ v.description }}</p>
-          </div>
-          <div class="text-right font-mono bg-aethel-bg px-5 py-3 rounded-lg border border-aethel-border">
-            <div class="text-xs text-aethel-muted uppercase">Відкриття капсули</div>
-            <div class="text-lg text-aethel-gold font-semibold">{{ v.unlock_at | date: 'yyyy-MM-dd' }}</div>
-          </div>
-        </section>
-      }
+      <!-- Stage 4: Locked Vault & Countdown Timer -->
+      <app-vault-timer
+        [unlockAt]="vault()?.unlock_at || ''"
+        [vaultTitle]="vault()?.vault_title || 'Велика Капсула Часу Міста — 2030'"
+        [vaultDescription]="vault()?.description || ''"
+      ></app-vault-timer>
+
+      <!-- Stage 6: Sponsored Spotlight (Paid Featured Items) -->
+      <app-sponsored-spotlight (openPayment)="openPayment()"></app-sponsored-spotlight>
+
+      <!-- Stage 3: Location Filter Bar -->
+      <app-location-filter-bar
+        [locations]="locations()"
+        (filterChange)="onFilterChange($event)"
+        (locationAdded)="onLocationAdded($event)"
+      ></app-location-filter-bar>
+
+      <!-- Stage 4: Media Upload -->
+      <app-media-upload
+        [locations]="locations()"
+        (uploadComplete)="onMediaUploaded($event)"
+      ></app-media-upload>
 
       <!-- Guest vs Registered Role Action Bar -->
       <section class="p-4 rounded-xl border border-aethel-border bg-aethel-surface/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -38,6 +68,9 @@ import { AuthService } from '../../core/services/auth.service';
             <div class="text-xs font-mono text-aethel-gold">
               ✓ Ви увійшли як &#64;{{ auth.profile()?.username || 'новий мешканець' }}
             </div>
+            @if (partnerBadge()?.partner_badge_label) {
+              <app-partner-badge [username]="auth.profile()?.username || null"></app-partner-badge>
+            }
             <p class="text-xs text-aethel-muted">
               Вам доступні ніки авторів, коментування, приватні повідомлення та завантаження медіа.
             </p>
@@ -103,6 +136,7 @@ import { AuthService } from '../../core/services/auth.service';
                   [alt]="item.caption || 'Знімок міста'"
                   class="w-full h-full object-cover"
                   loading="lazy"
+                  decoding="async"
                 />
                 @if (item.is_spotlight) {
                   <span class="absolute top-3 left-3 text-[11px] font-mono uppercase px-2.5 py-1 rounded bg-aethel-amber text-aethel-bg font-semibold">
@@ -125,28 +159,32 @@ import { AuthService } from '../../core/services/auth.service';
                 <div class="pt-3 border-t border-aethel-border space-y-3">
                   <div class="flex items-center justify-between text-xs">
                     @if (item.author_username) {
-                      <span class="font-mono text-aethel-gold">
+                      <button
+                        type="button"
+                        (click)="openDM(item.author_username)"
+                        class="font-mono font-semibold text-aethel-gold hover:underline transition"
+                      >
                         &#64;{{ item.author_username }}
-                      </span>
+                      </button>
                     } @else {
                       <span class="font-mono text-aethel-muted italic">
                         Анонімний мешканець (нік приховано для гостей)
                       </span>
                     }
 
-                    @if (item.author_partner_badge) {
-                      <span class="text-[11px] px-2 py-0.5 rounded border border-aethel-amber/40 text-aethel-amber">
-                        {{ item.author_partner_badge }}
-                      </span>
-                    }
+                    <app-partner-badge
+                      [username]="item.author_username"
+                    ></app-partner-badge>
                   </div>
 
                   <!-- Interaction buttons for Registered vs Guest -->
                   <div class="flex items-center justify-between pt-1">
                     @if (auth.isAuthenticated()) {
-                      <span class="text-[11px] font-mono text-aethel-muted">
-                        💬 Залишити коментар · ✉ Написати автору в DM
-                      </span>
+                      <div class="flex items-center gap-3">
+                        <span class="text-[11px] font-mono text-aethel-muted">
+                          💬 Коментарі · ✉ DM
+                        </span>
+                      </div>
                     } @else {
                       <button
                         type="button"
@@ -159,10 +197,30 @@ import { AuthService } from '../../core/services/auth.service';
                   </div>
                 </div>
               </div>
+
+              <!-- Stage 5: Comments under each media item -->
+              <app-comments [mediaId]="item.id"></app-comments>
             </article>
           }
         </div>
       </section>
+
+      <!-- Stage 4: Future Letters -->
+      <app-future-letters [locations]="locations()"></app-future-letters>
+
+      <!-- Stage 4: Audio-Geotagging Map -->
+      <app-audio-map></app-audio-map>
+
+      <!-- Stage 5: Direct Messages Chat -->
+      <app-direct-messages [autoOpen]="dmPartner()"></app-direct-messages>
+
+      <!-- Stage 6: Payment Modal -->
+      @if (paymentOpen()) {
+        <app-payment
+          [open]="paymentOpen()"
+          (close)="closePayment()"
+        ></app-payment>
+      }
     </div>
   `,
 })
@@ -173,12 +231,18 @@ export class HomeFeedComponent implements OnInit {
   readonly vault = signal<VaultStatus | null>(null);
   readonly locations = signal<LocationEntry[]>([]);
   readonly snapshots = signal<MediaSnapshot[]>([]);
+  readonly activeFilters = signal<MediaFilterParams>({});
+  readonly paymentOpen = signal<boolean>(false);
+
+  readonly dmPartner = signal<{ username: string; id: string } | null>(null);
+  readonly partnerBadge = signal<{ username: string | null; partner_badge_label: string | null; role: string | null; is_partner: boolean } | null>(null);
 
   constructor() {
     // Automatically reload feed when auth token changes so nicknames appear/disappear immediately
     effect(() => {
       this.auth.accessToken();
       this.loadSnapshots();
+      this.loadPartnerBadge();
     });
   }
 
@@ -187,12 +251,44 @@ export class HomeFeedComponent implements OnInit {
     this.api.getLocations().subscribe((locs) => this.locations.set(locs));
   }
 
+  onFilterChange(filters: MediaFilterParams): void {
+    this.activeFilters.set(filters);
+    this.loadSnapshots();
+  }
+
+  onLocationAdded(location: LocationEntry): void {
+    this.locations.update((list) => [...list, location]);
+  }
+
+  onMediaUploaded(snapshot: MediaSnapshot): void {
+    this.snapshots.update((list) => [snapshot, ...list]);
+  }
+
+  openDM(authorUsername: string): void {
+    this.dmPartner.set({ username: authorUsername, id: authorUsername });
+  }
+
+  openPayment(): void {
+    this.paymentOpen.set(true);
+  }
+
+  closePayment(): void {
+    this.paymentOpen.set(false);
+  }
+
   promptGuestAction(reason: string): void {
     this.auth.openAuthModal(reason);
   }
 
   private loadSnapshots(): void {
-    this.api.getMediaSnapshots().subscribe((items) => this.snapshots.set(items));
+    this.api.getMediaSnapshots(this.activeFilters()).subscribe((items) => this.snapshots.set(items));
+  }
+
+  private loadPartnerBadge(): void {
+    if (!this.auth.isAuthenticated()) return;
+    this.api.getPartnerBadge().subscribe({
+      next: (data) => this.partnerBadge.set(data),
+      error: () => this.partnerBadge.set(null),
+    });
   }
 }
-

@@ -54,3 +54,25 @@ export interface FutureLetterDTO {
   author_username: string | null;
 }
 
+export interface CommentDTO {
+  id: string;
+  media_id: string;
+  author_id: string;
+  content: string;
+  created_at: string;
+  // Stripped to null when requester is a Guest (PRD section 2)
+  author_username: string | null;
+}
+
+export interface DirectMessageDTO {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+  // Stripped to null when requester is not a participant
+  sender_username: string | null;
+  receiver_username: string | null;
+}
+
