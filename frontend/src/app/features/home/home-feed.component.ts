@@ -61,49 +61,6 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
         (uploadComplete)="onMediaUploaded($event)"
       ></app-media-upload>
 
-      <!-- Guest vs Registered Role Action Bar -->
-      <section class="p-4 rounded-xl border border-aethel-border bg-aethel-surface/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        @if (auth.isAuthenticated()) {
-          <div class="space-y-1">
-            <div class="text-xs font-mono text-aethel-gold">
-              ✓ You signed in as &#64;{{ auth.profile()?.username || 'new resident' }}
-            </div>
-            @if (partnerBadge()?.partner_badge_label) {
-              <app-partner-badge [username]="auth.profile()?.username || null"></app-partner-badge>
-            }
-            <p class="text-xs text-aethel-muted">
-              You have access to author nicknames, commenting, direct messages and media uploads.
-            </p>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="text-xs px-3.5 py-2 rounded-lg bg-aethel-amber text-aethel-bg font-medium hover:bg-aethel-gold transition"
-            >
-              + Add Memory / Location
-            </button>
-          </div>
-        } @else {
-          <div class="space-y-1">
-            <div class="text-xs font-mono text-aethel-muted">
-              👁 Guest Mode · Author nicknames hidden for privacy protection
-            </div>
-            <p class="text-xs text-aethel-muted">
-              Sign in with 1 click to see authors, leave comments and add your own memories.
-            </p>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              (click)="promptGuestAction('To upload photos or videos to the time capsule, sign in quickly.')"
-              class="text-xs px-3.5 py-2 rounded-lg border border-aethel-amber/60 text-aethel-gold hover:bg-aethel-amber hover:text-aethel-bg transition"
-            >
-              + Add Media (Quick Sign In)
-            </button>
-          </div>
-        }
-      </section>
-
       <!-- Locations Preview -->
       <section class="space-y-3">
         <h3 class="text-xs font-mono uppercase tracking-widest text-aethel-muted">
@@ -235,14 +192,12 @@ export class HomeFeedComponent implements OnInit {
   readonly paymentOpen = signal<boolean>(false);
 
   readonly dmPartner = signal<{ username: string; id: string } | null>(null);
-  readonly partnerBadge = signal<{ username: string | null; partner_badge_label: string | null; role: string | null; is_partner: boolean } | null>(null);
 
   constructor() {
     // Automatically reload feed when auth token changes so nicknames appear/disappear immediately
     effect(() => {
       this.auth.accessToken();
       this.loadSnapshots();
-      this.loadPartnerBadge();
     });
   }
 
@@ -282,13 +237,5 @@ export class HomeFeedComponent implements OnInit {
 
   private loadSnapshots(): void {
     this.api.getMediaSnapshots(this.activeFilters()).subscribe((items) => this.snapshots.set(items));
-  }
-
-  private loadPartnerBadge(): void {
-    if (!this.auth.isAuthenticated()) return;
-    this.api.getPartnerBadge().subscribe({
-      next: (data) => this.partnerBadge.set(data),
-      error: () => this.partnerBadge.set(null),
-    });
   }
 }
