@@ -21,10 +21,10 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <section class="p-5 rounded-xl border border-aethel-border bg-aethel-surface space-y-5">
+    <section class="p-5 rounded-xl border border-aethel-filter bg-aethel-surface space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <span class="text-xs font-mono uppercase tracking-widest text-aethel-amber">
+          <span class="text-xs font-mono uppercase tracking-widest text-aethel-filter">
             Геолокація та Хронологія
           </span>
           <h3 class="text-base font-serif text-aethel-cream">
@@ -46,7 +46,7 @@ import { AuthService } from '../../core/services/auth.service';
           <button
             type="button"
             (click)="onToggleAddLocation()"
-            class="text-xs font-mono px-3.5 py-1.5 rounded bg-aethel-bg border border-aethel-amber/60 text-aethel-gold hover:bg-aethel-amber hover:text-aethel-bg transition"
+            class="text-xs font-mono px-3.5 py-1.5 rounded bg-aethel-bg border border-aethel-filter/60 text-aethel-filter hover:bg-aethel-filter hover:text-aethel-bg transition"
           >
             {{ showAddForm() ? '✕ Закрити форму' : '+ Додати новий район' }}
           </button>
@@ -63,7 +63,7 @@ import { AuthService } from '../../core/services/auth.service';
           <select
             [ngModel]="selectedCountry()"
             (ngModelChange)="onCountryChange($event)"
-            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
+            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
           >
             <option value="">Усі країни</option>
             @for (country of countries(); track country) {
@@ -81,7 +81,7 @@ import { AuthService } from '../../core/services/auth.service';
             [ngModel]="selectedCity()"
             (ngModelChange)="onCityChange($event)"
             [disabled]="!selectedCountry()"
-            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber disabled:opacity-40"
+            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter disabled:opacity-40"
           >
             <option value="">Усі міста</option>
             @for (city of citiesForCountry(); track city) {
@@ -99,7 +99,7 @@ import { AuthService } from '../../core/services/auth.service';
             [ngModel]="selectedLocationId()"
             (ngModelChange)="onDistrictChange($event)"
             [disabled]="!selectedCity()"
-            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber disabled:opacity-40"
+            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter disabled:opacity-40"
           >
             <option value="">Усі райони</option>
             @for (loc of districtsForCity(); track loc.id) {
@@ -116,7 +116,7 @@ import { AuthService } from '../../core/services/auth.service';
           <select
             [ngModel]="selectedYear()"
             (ngModelChange)="onYearChange($event)"
-            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
+            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
           >
             <option value="">Усі роки</option>
             @for (y of availableYears; track y) {
@@ -134,7 +134,7 @@ import { AuthService } from '../../core/services/auth.service';
             [ngModel]="selectedMonth()"
             (ngModelChange)="onMonthChange($event)"
             [disabled]="!selectedYear()"
-            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber disabled:opacity-40"
+            class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter disabled:opacity-40"
           >
             <option value="">Усі місяці</option>
             @for (m of months; track m.value) {
@@ -161,7 +161,7 @@ import { AuthService } from '../../core/services/auth.service';
               [(ngModel)]="newCountry"
               placeholder="Країна (напр., Україна)"
               required
-              class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
+              class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
             />
             <input
               type="text"
@@ -169,7 +169,7 @@ import { AuthService } from '../../core/services/auth.service';
               [(ngModel)]="newCity"
               placeholder="Місто (напр., Київ)"
               required
-              class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
+              class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
             />
             <input
               type="text"
@@ -177,7 +177,7 @@ import { AuthService } from '../../core/services/auth.service';
               [(ngModel)]="newDistrict"
               placeholder="Район (напр., Воздвиженка)"
               required
-              class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
+              class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
             />
           </div>
 
@@ -191,7 +191,7 @@ import { AuthService } from '../../core/services/auth.service';
             <button
               type="submit"
               [disabled]="savingLocation()"
-              class="px-4 py-2 rounded-lg bg-aethel-amber text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40"
+              class="px-4 py-2 rounded-lg bg-aethel-filter text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40"
             >
               {{ savingLocation() ? 'Збереження...' : 'Зберегти та обрати район' }}
             </button>
