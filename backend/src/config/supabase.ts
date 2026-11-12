@@ -1,4 +1,4 @@
-// Supabase вилучено з проєкту. Система працює в режимі демо/вбудованих даних.
+// Supabase removed from project. System works in demo/built-in data mode.
 export const isSupabaseConfigured = false;
 
 export interface SupabaseClient {}

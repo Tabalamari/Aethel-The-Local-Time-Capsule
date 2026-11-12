@@ -20,10 +20,10 @@ import { AuthService } from '../../core/services/auth.service';
           <div class="flex items-start justify-between gap-4">
             <div>
               <span class="text-xs font-mono uppercase tracking-widest text-aethel-amber">
-                Швидка автентифікація
+                Quick Authentication
               </span>
               <h2 class="text-xl font-serif text-aethel-cream mt-1">
-                Приєднатися до капсули часу
+                Join the Time Capsule
               </h2>
             </div>
             <button
@@ -42,8 +42,7 @@ import { AuthService } from '../../core/services/auth.service';
           }
 
           <p class="text-xs text-aethel-muted leading-relaxed">
-            Без паролів і довгих анкет. Після першого входу ви оберете унікальний нікнейм, щоб
-            ваше справжнє ім'я залишалося приватним.
+            No passwords or long forms. After first sign-in, you will choose a unique nickname so your real name stays private.
           </p>
 
           <!-- Google OAuth Button -->
@@ -52,13 +51,13 @@ import { AuthService } from '../../core/services/auth.service';
             (click)="onGoogleSignIn()"
             class="w-full py-2.5 px-4 rounded-lg bg-aethel-cream text-aethel-bg font-medium text-sm hover:bg-white transition flex items-center justify-center gap-2"
           >
-            <span>Увійти через Google-акаунт</span>
+            <span>Sign in with Google Account</span>
           </button>
 
           <div class="relative flex py-1 items-center">
             <div class="flex-grow border-t border-aethel-border"></div>
             <span class="flex-shrink mx-3 text-[11px] font-mono uppercase text-aethel-muted">
-              або магічне посилання
+              or magic link
             </span>
             <div class="flex-grow border-t border-aethel-border"></div>
           </div>
@@ -67,13 +66,13 @@ import { AuthService } from '../../core/services/auth.service';
           <form (ngSubmit)="onSendMagicLink()" class="space-y-3">
             <div>
               <label class="block text-xs font-mono text-aethel-muted mb-1">
-                Електронна пошта
+                Email
               </label>
               <input
                 type="email"
                 name="email"
                 [(ngModel)]="email"
-                placeholder="resident@town.ua"
+                placeholder="resident@town.example"
                 required
                 class="w-full px-3.5 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-sm text-aethel-cream focus:outline-none focus:border-aethel-amber"
               />
@@ -82,7 +81,7 @@ import { AuthService } from '../../core/services/auth.service';
               type="submit"
               class="w-full py-2.5 px-4 rounded-lg bg-aethel-amber text-aethel-bg font-medium text-sm hover:bg-aethel-gold transition"
             >
-              Надіслати магічне посилання
+              Send Magic Link
             </button>
           </form>
 
@@ -95,7 +94,7 @@ import { AuthService } from '../../core/services/auth.service';
           <!-- Quick Demo Shortcuts for Local Testing -->
           <div class="pt-4 border-t border-aethel-border space-y-2">
             <div class="text-[11px] font-mono uppercase text-aethel-muted">
-              Швидкий тест режимів (Dev / Demo):
+              Quick test modes (Dev / Demo):
             </div>
             <div class="grid grid-cols-2 gap-2">
               <button
@@ -103,14 +102,14 @@ import { AuthService } from '../../core/services/auth.service';
                 (click)="auth.signInDemoNewUser()"
                 class="text-xs py-2 px-3 rounded border border-aethel-border bg-aethel-bg text-aethel-cream hover:border-aethel-amber transition"
               >
-                Новий користувач (Вибір ніка)
+                New User (Username Selection)
               </button>
               <button
                 type="button"
                 (click)="auth.signInDemoExistingUser()"
                 class="text-xs py-2 px-3 rounded border border-aethel-border bg-aethel-bg text-aethel-gold hover:border-aethel-amber transition"
               >
-                Вхід як &#64;podil_archivist
+                Sign in as &#64;podil_archivist
               </button>
             </div>
           </div>

@@ -64,14 +64,14 @@ export class AuthService {
   async sendMagicLink(email: string): Promise<{ sent: boolean; message: string }> {
     const trimmed = email.trim();
     if (!trimmed || !trimmed.includes('@')) {
-      return { sent: false, message: 'Введіть коректну електронну пошту.' };
+      return { sent: false, message: 'Please enter a valid email address.' };
     }
 
     // Local development simulation: sign in as a new user requiring unique username onboarding
     this.signInDemoNewUser();
     return {
       sent: true,
-      message: 'Демо-режим: виконано швидкий вхід. Оберіть свій унікальний нікнейм!',
+      message: 'Demo mode: quick sign-in performed. Choose your unique nickname!',
     };
   }
 

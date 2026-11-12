@@ -25,10 +25,10 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <span class="text-xs font-mono uppercase tracking-widest text-aethel-filter">
-            Геолокація та Хронологія
+            Geolocation & Chronology
           </span>
           <h3 class="text-base font-serif text-aethel-cream">
-            Послідовний вибір: Країна → Місто → Район та фільтр за часом
+            Sequential selection: Country → City → District and time filter
           </h3>
         </div>
 
@@ -39,7 +39,7 @@ import { AuthService } from '../../core/services/auth.service';
               (click)="resetFilters()"
               class="text-xs font-mono px-3 py-1.5 rounded border border-aethel-border text-aethel-muted hover:text-aethel-cream transition"
             >
-              Скинути фільтри
+              Reset Filters
             </button>
           }
 
@@ -48,7 +48,7 @@ import { AuthService } from '../../core/services/auth.service';
             (click)="onToggleAddLocation()"
             class="text-xs font-mono px-3.5 py-1.5 rounded bg-aethel-bg border border-aethel-filter/60 text-aethel-filter hover:bg-aethel-filter hover:text-aethel-bg transition"
           >
-            {{ showAddForm() ? '✕ Закрити форму' : '+ Додати новий район' }}
+            {{ showAddForm() ? '✕ Close Form' : '+ Add New District' }}
           </button>
         </div>
       </div>
@@ -58,14 +58,14 @@ import { AuthService } from '../../core/services/auth.service';
         <!-- 1. Country -->
         <div>
           <label class="block text-[11px] font-mono uppercase text-aethel-muted mb-1">
-            1. Країна
+            1. Country
           </label>
           <select
             [ngModel]="selectedCountry()"
             (ngModelChange)="onCountryChange($event)"
             class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
           >
-            <option value="">Усі країни</option>
+            <option value="">All Countries</option>
             @for (country of countries(); track country) {
               <option [value]="country">{{ country }}</option>
             }
@@ -75,7 +75,7 @@ import { AuthService } from '../../core/services/auth.service';
         <!-- 2. City -->
         <div>
           <label class="block text-[11px] font-mono uppercase text-aethel-muted mb-1">
-            2. Місто
+            2. City
           </label>
           <select
             [ngModel]="selectedCity()"
@@ -83,7 +83,7 @@ import { AuthService } from '../../core/services/auth.service';
             [disabled]="!selectedCountry()"
             class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter disabled:opacity-40"
           >
-            <option value="">Усі міста</option>
+            <option value="">All Cities</option>
             @for (city of citiesForCountry(); track city) {
               <option [value]="city">{{ city }}</option>
             }
@@ -93,7 +93,7 @@ import { AuthService } from '../../core/services/auth.service';
         <!-- 3. District -->
         <div>
           <label class="block text-[11px] font-mono uppercase text-aethel-muted mb-1">
-            3. Район
+            3. District
           </label>
           <select
             [ngModel]="selectedLocationId()"
@@ -101,7 +101,7 @@ import { AuthService } from '../../core/services/auth.service';
             [disabled]="!selectedCity()"
             class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter disabled:opacity-40"
           >
-            <option value="">Усі райони</option>
+            <option value="">All Districts</option>
             @for (loc of districtsForCity(); track loc.id) {
               <option [value]="loc.id">{{ loc.district }}</option>
             }
@@ -111,14 +111,14 @@ import { AuthService } from '../../core/services/auth.service';
         <!-- 4. Year Filter -->
         <div>
           <label class="block text-[11px] font-mono uppercase text-aethel-muted mb-1">
-            Рік знімка
+            Snapshot Year
           </label>
           <select
             [ngModel]="selectedYear()"
             (ngModelChange)="onYearChange($event)"
             class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
           >
-            <option value="">Усі роки</option>
+            <option value="">All Years</option>
             @for (y of availableYears; track y) {
               <option [value]="y">{{ y }}</option>
             }
@@ -128,7 +128,7 @@ import { AuthService } from '../../core/services/auth.service';
         <!-- 5. Month Filter -->
         <div>
           <label class="block text-[11px] font-mono uppercase text-aethel-muted mb-1">
-            Місяць
+            Month
           </label>
           <select
             [ngModel]="selectedMonth()"
@@ -136,7 +136,7 @@ import { AuthService } from '../../core/services/auth.service';
             [disabled]="!selectedYear()"
             class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter disabled:opacity-40"
           >
-            <option value="">Усі місяці</option>
+            <option value="">All Months</option>
             @for (m of months; track m.value) {
               <option [value]="m.value">{{ m.label }}</option>
             }
@@ -151,7 +151,7 @@ import { AuthService } from '../../core/services/auth.service';
           class="pt-4 border-t border-aethel-border space-y-3"
         >
           <div class="text-xs font-mono text-aethel-gold">
-            Додавання нового району до бази локацій (із захистом від дублікатів):
+            Adding new district to locations database (with duplicate protection):
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -159,7 +159,7 @@ import { AuthService } from '../../core/services/auth.service';
               type="text"
               name="newCountry"
               [(ngModel)]="newCountry"
-              placeholder="Країна (напр., Україна)"
+              placeholder="Country (e.g., Ukraine)"
               required
               class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
             />
@@ -167,7 +167,7 @@ import { AuthService } from '../../core/services/auth.service';
               type="text"
               name="newCity"
               [(ngModel)]="newCity"
-              placeholder="Місто (напр., Київ)"
+              placeholder="City (e.g., Kyiv)"
               required
               class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
             />
@@ -175,7 +175,7 @@ import { AuthService } from '../../core/services/auth.service';
               type="text"
               name="newDistrict"
               [(ngModel)]="newDistrict"
-              placeholder="Район (напр., Воздвиженка)"
+              placeholder="District (e.g., Vozdvyzhenka)"
               required
               class="px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-filter"
             />
@@ -193,7 +193,7 @@ import { AuthService } from '../../core/services/auth.service';
               [disabled]="savingLocation()"
               class="px-4 py-2 rounded-lg bg-aethel-filter text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40"
             >
-              {{ savingLocation() ? 'Збереження...' : 'Зберегти та обрати район' }}
+              {{ savingLocation() ? 'Saving...' : 'Save and Select District' }}
             </button>
           </div>
         </form>
@@ -224,24 +224,24 @@ export class LocationFilterBarComponent {
   readonly savingLocation = signal<boolean>(false);
   readonly formFeedback = signal<string | null>(null);
 
-  newCountry = 'Україна';
+  newCountry = 'Ukraine';
   newCity = '';
   newDistrict = '';
 
   readonly availableYears = ['2026', '2025', '2024', '2023'];
   readonly months = [
-    { value: '01', label: '01 · Січень' },
-    { value: '02', label: '02 · Лютий' },
-    { value: '03', label: '03 · Березень' },
-    { value: '04', label: '04 · Квітень' },
-    { value: '05', label: '05 · Травень' },
-    { value: '06', label: '06 · Червень' },
-    { value: '07', label: '07 · Липень' },
-    { value: '08', label: '08 · Серпень' },
-    { value: '09', label: '09 · Вересень' },
-    { value: '10', label: '10 · Жовтень' },
-    { value: '11', label: '11 · Листопад' },
-    { value: '12', label: '12 · Грудень' },
+    { value: '01', label: '01 · January' },
+    { value: '02', label: '02 · February' },
+    { value: '03', label: '03 · March' },
+    { value: '04', label: '04 · April' },
+    { value: '05', label: '05 · May' },
+    { value: '06', label: '06 · June' },
+    { value: '07', label: '07 · July' },
+    { value: '08', label: '08 · August' },
+    { value: '09', label: '09 · September' },
+    { value: '10', label: '10 · October' },
+    { value: '11', label: '11 · November' },
+    { value: '12', label: '12 · December' },
   ];
 
   readonly countries = computed(() => {
@@ -319,7 +319,7 @@ export class LocationFilterBarComponent {
 
   onToggleAddLocation(): void {
     if (!this.auth.isAuthenticated()) {
-      this.auth.openAuthModal('Увійдіть, щоб додавати нові міста або райони на карту капсули часу.');
+      this.auth.openAuthModal('Sign in to add new cities or districts to the time capsule map.');
       return;
     }
     this.showAddForm.update((v) => !v);
@@ -330,7 +330,7 @@ export class LocationFilterBarComponent {
 
   onSubmitNewLocation(): void {
     if (!this.newCountry.trim() || !this.newCity.trim() || !this.newDistrict.trim()) {
-      this.formFeedback.set('Заповніть усі три поля локації.');
+      this.formFeedback.set('Fill in all three location fields.');
       return;
     }
 
@@ -365,7 +365,7 @@ export class LocationFilterBarComponent {
             this.emitFilters();
             return;
           }
-          this.formFeedback.set(err?.error?.message || 'Не вдалося додати локацію');
+          this.formFeedback.set(err?.error?.message || 'Failed to add location');
         },
       });
   }

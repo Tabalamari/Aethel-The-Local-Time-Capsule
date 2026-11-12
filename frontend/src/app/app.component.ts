@@ -22,7 +22,7 @@ import { UsernameOnboardingModalComponent } from './features/auth/username-onboa
         <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
           <a routerLink="/" class="block">
             <span class="text-xs uppercase tracking-widest text-aethel-amber font-mono">
-              Гіперлокальний цифровий архів
+              Hyperlocal Digital Archive
             </span>
             <h1 class="text-2xl font-serif tracking-tight text-aethel-cream">
               Aethel <span class="text-aethel-muted font-normal text-base">· The Local Time Capsule</span>
@@ -35,28 +35,28 @@ import { UsernameOnboardingModalComponent } from './features/auth/username-onboa
                 routerLink="/my-archive"
                 class="text-xs px-3 py-1.5 rounded-lg border border-aethel-border text-aethel-cream hover:border-aethel-amber font-mono transition"
               >
-                Мій архів
+                My Archive
               </a>
               <span class="text-xs px-3 py-1.5 rounded-full bg-aethel-bg border border-aethel-amber/40 text-aethel-gold font-mono">
-                &#64;{{ auth.profile()?.username || 'очікує нік...' }}
+                &#64;{{ auth.profile()?.username || 'awaiting nick...' }}
               </span>
               <button
                 type="button"
                 (click)="auth.signOut()"
                 class="text-xs px-3 py-1.5 rounded-lg border border-aethel-border text-aethel-muted hover:text-aethel-cream font-mono transition"
               >
-                Вийти
+                Sign Out
               </button>
             } @else {
               <span class="text-xs px-3 py-1 rounded-full border border-aethel-border text-aethel-muted font-mono">
-                Гість (ніки приховано)
+                Guest (nicknames hidden)
               </span>
               <button
                 type="button"
                 (click)="auth.openAuthModal()"
                 class="text-xs px-4 py-2 rounded-lg bg-aethel-amber text-aethel-bg font-medium hover:bg-aethel-gold transition"
               >
-                Швидкий вхід
+                Quick Sign In
               </button>
             }
           </div>

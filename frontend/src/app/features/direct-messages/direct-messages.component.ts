@@ -22,7 +22,7 @@ import { AuthService } from '../../core/services/auth.service';
               {{ partnerUsername() }}
             </h3>
             <p class="text-[10px] text-aethel-muted">
-              Приватне повідомлення
+              Private Message
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ import { AuthService } from '../../core/services/auth.service';
                   [class.text-aethel-gold]="msg.sender_id === myId()"
                   [class.text-aethel-muted]="msg.sender_id !== myId()"
                 >
-                  {{ msg.sender_id === myId() ? 'Ви' : '@' + (msg.sender_username || 'користувач') }}
+                  {{ msg.sender_id === myId() ? 'You' : '@' + (msg.sender_username || 'user') }}
                 </span>
                 <span class="text-[10px] text-aethel-muted">
                   {{ msg.created_at | date:'HH:mm' }}
@@ -66,8 +66,8 @@ import { AuthService } from '../../core/services/auth.service';
         }
         @if (messages().length === 0) {
           <div class="h-full flex flex-col items-center justify-center text-aethel-muted text-xs font-mono">
-            <p>Ще немає повідомлень.</p>
-            <p class="text-[10px] opacity-50 mt-1">Напишіть перше повідомлення вище.</p>
+            <p>No messages yet.</p>
+            <p class="text-[10px] opacity-50 mt-1">Write your first message above.</p>
           </div>
         }
       </div>
@@ -80,7 +80,7 @@ import { AuthService } from '../../core/services/auth.service';
               [(ngModel)]="messageText"
               name="content"
               rows="2"
-              placeholder="Напишіть повідомлення..."
+              placeholder="Write message..."
               required
               class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
             ></textarea>
@@ -89,7 +89,7 @@ import { AuthService } from '../../core/services/auth.service';
               [disabled]="!messageText.trim() || isSending()"
               class="absolute right-2 top-2 px-3 py-1.5 bg-aethel-amber text-aethel-bg text-[10px] font-medium rounded hover:bg-aethel-gold transition disabled:opacity-40"
             >
-              Надіслати
+              Send
             </button>
           </div>
           @if (sendError()) {
@@ -174,7 +174,7 @@ export class DirectMessagesComponent {
         this.messageText = '';
       }
     } catch (err: any) {
-      this.sendError.set(err?.error?.message || 'Не вдалося надіслати повідомлення.');
+      this.sendError.set(err?.error?.message || 'Failed to send message.');
     } finally {
       this.isSending.set(false);
     }

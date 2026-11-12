@@ -41,7 +41,7 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
       <!-- Stage 4: Locked Vault & Countdown Timer -->
       <app-vault-timer
         [unlockAt]="vault()?.unlock_at || ''"
-        [vaultTitle]="vault()?.vault_title || 'Велика Капсула Часу Міста — 2030'"
+        [vaultTitle]="vault()?.vault_title || 'Great City Time Capsule — 2030'"
         [vaultDescription]="vault()?.description || ''"
       ></app-vault-timer>
 
@@ -66,13 +66,13 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
         @if (auth.isAuthenticated()) {
           <div class="space-y-1">
             <div class="text-xs font-mono text-aethel-gold">
-              ✓ Ви увійшли як &#64;{{ auth.profile()?.username || 'новий мешканець' }}
+              ✓ You signed in as &#64;{{ auth.profile()?.username || 'new resident' }}
             </div>
             @if (partnerBadge()?.partner_badge_label) {
               <app-partner-badge [username]="auth.profile()?.username || null"></app-partner-badge>
             }
             <p class="text-xs text-aethel-muted">
-              Вам доступні ніки авторів, коментування, приватні повідомлення та завантаження медіа.
+              You have access to author nicknames, commenting, direct messages and media uploads.
             </p>
           </div>
           <div class="flex flex-wrap gap-2">
@@ -80,25 +80,25 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
               type="button"
               class="text-xs px-3.5 py-2 rounded-lg bg-aethel-amber text-aethel-bg font-medium hover:bg-aethel-gold transition"
             >
-              + Додати знімок / локацію
+              + Add Memory / Location
             </button>
           </div>
         } @else {
           <div class="space-y-1">
             <div class="text-xs font-mono text-aethel-muted">
-              👁 Режим Гостя (Guest) · Ніки авторів приховано для захисту приватності
+              👁 Guest Mode · Author nicknames hidden for privacy protection
             </div>
             <p class="text-xs text-aethel-muted">
-              Увійдіть у 1 клік, щоб бачити авторів, залишати коментарі та додавати власні спогади.
+              Sign in with 1 click to see authors, leave comments and add your own memories.
             </p>
           </div>
           <div class="flex flex-wrap gap-2">
             <button
               type="button"
-              (click)="promptGuestAction('Щоб завантажити фото чи відео у капсулу часу, виконайте швидкий вхід.')"
+              (click)="promptGuestAction('To upload photos or videos to the time capsule, sign in quickly.')"
               class="text-xs px-3.5 py-2 rounded-lg border border-aethel-amber/60 text-aethel-gold hover:bg-aethel-amber hover:text-aethel-bg transition"
             >
-              + Додати медіа (Швидкий вхід)
+              + Add Media (Quick Sign In)
             </button>
           </div>
         }
@@ -107,7 +107,7 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
       <!-- Locations Preview -->
       <section class="space-y-3">
         <h3 class="text-xs font-mono uppercase tracking-widest text-aethel-muted">
-          Доступні локації ({{ locations().length }})
+          Available Locations ({{ locations().length }})
         </h3>
         <div class="flex flex-wrap gap-2">
           @for (loc of locations(); track loc.id) {
@@ -121,9 +121,9 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
       <!-- Daily Snapshots Feed -->
       <section class="space-y-4">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg font-serif text-aethel-cream">Daily Snapshots · Щоденні знімки</h3>
+          <h3 class="text-lg font-serif text-aethel-cream">Daily Snapshots · Daily Snapshots</h3>
           <span class="text-xs text-aethel-muted font-mono">
-            Вибірка за автором у загальній стрічці вимкнена
+            Author filter in general feed disabled
           </span>
         </div>
 
@@ -133,7 +133,7 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
               <div class="aspect-video bg-black/40 overflow-hidden relative">
                 <img
                   [src]="item.media_url"
-                  [alt]="item.caption || 'Знімок міста'"
+                  [alt]="item.caption || 'City Snapshot'"
                   class="w-full h-full object-cover"
                   loading="lazy"
                   decoding="async"
@@ -168,7 +168,7 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
                       </button>
                     } @else {
                       <span class="font-mono text-aethel-muted italic">
-                        Анонімний мешканець (нік приховано для гостей)
+                        Anonymous Resident (nickname hidden for guests)
                       </span>
                     }
 
@@ -182,16 +182,16 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
                     @if (auth.isAuthenticated()) {
                       <div class="flex items-center gap-3">
                         <span class="text-[11px] font-mono text-aethel-muted">
-                          💬 Коментарі · ✉ DM
+                          💬 Comments · ✉ DM
                         </span>
                       </div>
                     } @else {
                       <button
                         type="button"
-                        (click)="promptGuestAction('Увійдіть, щоб залишати коментарі або писати авторам у Direct Messages.')"
+                        (click)="promptGuestAction('Sign in to leave comments or write to authors via Direct Messages.')"
                         class="text-[11px] font-mono text-aethel-amber hover:underline"
                       >
-                        Увійти, щоб коментувати або написати автору →
+                        Sign in to comment or write to author →
                       </button>
                     }
                   </div>

@@ -24,54 +24,54 @@ function normalizePlaceName(value: string): string {
 const SEED_LOCATIONS: LocationItem[] = [
   {
     id: 'loc-kyiv-podil',
-    country: 'Україна',
-    city: 'Київ',
-    district: 'Поділ',
+    country: 'Ukraine',
+    city: 'Kyiv',
+    district: 'Podil',
     center_lat: 50.4688,
     center_lng: 30.5161,
     created_at: new Date().toISOString(),
   },
   {
     id: 'loc-kyiv-zoloti',
-    country: 'Україна',
-    city: 'Київ',
-    district: 'Золоті Ворота',
+    country: 'Ukraine',
+    city: 'Kyiv',
+    district: 'Golden Gate',
     center_lat: 50.4488,
     center_lng: 30.5133,
     created_at: new Date().toISOString(),
   },
   {
     id: 'loc-lviv-rynok',
-    country: 'Україна',
-    city: 'Львів',
-    district: 'Площа Ринок',
+    country: 'Ukraine',
+    city: 'Lviv',
+    district: 'Rynok Square',
     center_lat: 49.8419,
     center_lng: 24.0315,
     created_at: new Date().toISOString(),
   },
   {
     id: 'loc-lviv-kastelivka',
-    country: 'Україна',
-    city: 'Львів',
-    district: 'Кастелівка',
+    country: 'Ukraine',
+    city: 'Lviv',
+    district: 'Castle Hill',
     center_lat: 49.8295,
     center_lng: 24.011,
     created_at: new Date().toISOString(),
   },
   {
     id: 'loc-odesa-prymorskyi',
-    country: 'Україна',
-    city: 'Одеса',
-    district: 'Приморський',
+    country: 'Ukraine',
+    city: 'Odesa',
+    district: 'Primorsky',
     center_lat: 46.4825,
     center_lng: 30.7233,
     created_at: new Date().toISOString(),
   },
   {
     id: 'loc-if-stometrivka',
-    country: 'Україна',
-    city: 'Івано-Франківськ',
-    district: 'Стометрівка',
+    country: 'Ukraine',
+    city: 'Ivano-Frankivsk',
+    district: 'Sotmetrivka',
     center_lat: 48.9226,
     center_lng: 24.7111,
     created_at: new Date().toISOString(),
@@ -82,9 +82,9 @@ const SEED_LOCATIONS: LocationItem[] = [
 apiRouter.get('/vault', async (_req: AuthenticatedRequest, res: Response) => {
   res.json({
     id: 'vault-main-2030',
-    vault_title: 'Велика Капсула Часу Міста — 2030',
+    vault_title: 'Great City Time Capsule — 2030',
     description:
-      'Спільний цифровий сейф спогадів, ранкових фото, голосів вулиць та листів у майбутнє.',
+      'Shared digital vault of memories, morning photos, street voices and letters to the future.',
     unlock_at: '2030-01-01T00:00:00Z',
     is_locked: true,
   });
@@ -107,7 +107,7 @@ apiRouter.post(
     if (!country || !city || !district) {
       res.status(400).json({
         error: 'INVALID_LOCATION',
-        message: 'Будь ласка, вкажіть країну, місто та назву району.',
+        message: 'Please specify country, city and district name.',
       });
       return;
     }
@@ -123,7 +123,7 @@ apiRouter.post(
     if (duplicate) {
       res.status(409).json({
         error: 'LOCATION_EXISTS',
-        message: 'Такий район вже існує у списку локацій.',
+        message: 'This district already exists in the locations list.',
         location: duplicate,
       });
       return;
@@ -156,27 +156,27 @@ apiRouter.get(
       {
         id: 'snap-1',
         location_id: 'loc-kyiv-podil',
-        location: { country: 'Україна', city: 'Київ', district: 'Поділ' },
+        location: { country: 'Ukraine', city: 'Kyiv', district: 'Podil' },
         media_url:
           'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80',
         media_type: 'photo',
         captured_date: '2026-11-10',
-        caption: 'Ранковий туман над Контрактовою о 07:40 та перша кава біля трамвайної колії.',
+        caption: 'Morning fog over Kontraktova at 07:40 and the first coffee by the tram tracks.',
         is_spotlight: true,
         created_at: new Date().toISOString(),
         author_username: isRegistered ? 'podil_archivist' : null,
         author_role: isRegistered ? 'partner_guardian' : null,
-        author_partner_badge: isRegistered ? 'Хранитель історії · Кав’ярня Світлиця' : null,
+        author_partner_badge: isRegistered ? 'Keeper of History · Svitlytsia Cafe' : null,
       },
       {
         id: 'snap-2',
         location_id: 'loc-lviv-rynok',
-        location: { country: 'Україна', city: 'Львів', district: 'Площа Ринок' },
+        location: { country: 'Ukraine', city: 'Lviv', district: 'Rynok Square' },
         media_url:
           'https://images.unsplash.com/photo-1555992336-fb0d29498b13?auto=format&fit=crop&w=900&q=80',
         media_type: 'photo',
         captured_date: '2026-11-09',
-        caption: 'Дощовий вечір і відблиски ліхтарів на бруківці після закриття книгарень.',
+        caption: 'Rainy evening and lantern reflections on cobblestones after bookstores closed.',
         is_spotlight: false,
         created_at: new Date().toISOString(),
         author_username: isRegistered ? 'lviv_rain_watcher' : null,
@@ -186,12 +186,12 @@ apiRouter.get(
       {
         id: 'snap-3',
         location_id: 'loc-odesa-prymorskyi',
-        location: { country: 'Україна', city: 'Одеса', district: 'Приморський' },
+        location: { country: 'Ukraine', city: 'Odesa', district: 'Primorsky' },
         media_url:
           'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80',
         media_type: 'photo',
         captured_date: '2026-08-19',
-        caption: 'Серпневий світанок біля пірсу, коли місто ще спить, а море вже тепле.',
+        caption: 'August sunrise by the pier, when the city still sleeps and the sea is already warm.',
         is_spotlight: false,
         created_at: new Date().toISOString(),
         author_username: isRegistered ? 'black_sea_listener' : null,
@@ -201,17 +201,17 @@ apiRouter.get(
       {
         id: 'snap-4',
         location_id: 'loc-kyiv-zoloti',
-        location: { country: 'Україна', city: 'Київ', district: 'Золоті Ворота' },
+        location: { country: 'Ukraine', city: 'Kyiv', district: 'Golden Gate' },
         media_url:
           'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=900&q=80',
         media_type: 'photo',
         captured_date: '2025-12-24',
-        caption: 'Перший грудневий сніг у сквері на Рейтарській та тепле світло у вікнах.',
+        caption: 'First December snow in the yard on Reytarska Street and warm light in windows.',
         is_spotlight: false,
         created_at: new Date().toISOString(),
         author_username: isRegistered ? 'podil_archivist' : null,
         author_role: isRegistered ? 'partner_guardian' : null,
-        author_partner_badge: isRegistered ? 'Хранитель історії · Кав’ярня Світлиця' : null,
+        author_partner_badge: isRegistered ? 'Keeper of History · Svitlytsia Cafe' : null,
       },
     ];
 
@@ -255,18 +255,18 @@ apiRouter.get(
         {
           id: 'snap-1',
           location_id: 'loc-kyiv-podil',
-          location: { country: 'Україна', city: 'Київ', district: 'Поділ' },
+          location: { country: 'Ukraine', city: 'Kyiv', district: 'Podil' },
           media_url:
             'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80',
           media_type: 'photo',
           captured_date: '2026-11-10',
-          caption: 'Ранковий туман над Контрактовою о 07:40 та перша кава біля трамвайної колії.',
+          caption: 'Morning fog over Kontraktova at 07:40 and the first coffee by the tram tracks.',
           is_spotlight: true,
           created_at: new Date().toISOString(),
           author_username: profile?.username || 'podil_archivist',
           author_role: profile?.role || 'partner_guardian',
           author_partner_badge:
-            profile?.partner_badge_label || 'Хранитель історії · Кав’ярня Світлиця',
+            profile?.partner_badge_label || 'Keeper of History · Svitlytsia Cafe',
         },
       ]);
       return;
@@ -284,7 +284,7 @@ apiRouter.get('/future-letters', async (req: AuthenticatedRequest, res: Response
     {
       id: 'letter-2050',
       location_id: 'loc-kyiv-podil',
-      title: 'Тим, хто гулятиме Набережною у 2050 році',
+      title: 'To Those Who Will Walk the Embankment in 2050',
       content: null, // Locked on backend until 2050-05-15
       unlock_date: '2050-05-15',
       is_unlocked: false,
@@ -316,7 +316,7 @@ apiRouter.post(
     if (!location_id || !media_url || !media_type || !captured_date) {
       res.status(400).json({
         error: 'INVALID_MEDIA',
-        message: 'Потрібні поля: локація, медіафайл, тип і дата знімка.',
+        message: 'Required fields: location, media file, type and snapshot date.',
       });
       return;
     }
@@ -349,7 +349,7 @@ apiRouter.get(
     if (!media_id || typeof media_id !== 'string') {
       res.status(400).json({
         error: 'INVALID_REQUEST',
-        message: 'Потрібен параметр media_id.',
+        message: 'media_id parameter required.',
       });
       return;
     }
@@ -370,7 +370,7 @@ apiRouter.post(
     if (!media_id || !content || String(content).trim().length === 0) {
       res.status(400).json({
         error: 'INVALID_COMMENT',
-        message: 'Потрібні поля: media_id та вміст коментаря.',
+        message: 'Required fields: media_id and comment content.',
       });
       return;
     }
@@ -400,7 +400,7 @@ apiRouter.get(
     if (!otherUserId || typeof otherUserId !== 'string') {
       res.status(400).json({
         error: 'INVALID_REQUEST',
-        message: 'Потрібен параметр with (нік або ID собесіра).',
+        message: 'with parameter required (nickname or ID of interlocutor).',
       });
       return;
     }
@@ -421,7 +421,7 @@ apiRouter.post(
     if (!receiver_id || !content || String(content).trim().length === 0) {
       res.status(400).json({
         error: 'INVALID_MESSAGE',
-        message: 'Потрібні поля: receiver_id та вміст повідомлення.',
+        message: 'Required fields: receiver_id and message content.',
       });
       return;
     }
@@ -429,7 +429,7 @@ apiRouter.post(
     if (senderId === receiver_id) {
       res.status(400).json({
         error: 'CANNOT_MESSAGE_SELF',
-        message: 'Неможливо надіслати повідомлення собі.',
+        message: 'Cannot send message to yourself.',
       });
       return;
     }
@@ -459,7 +459,7 @@ apiRouter.post(
     if (!location_id || !title || !content || !unlock_date) {
       res.status(400).json({
         error: 'INVALID_LETTER',
-        message: 'Потрібні поля: локація, заголовок, текст і дата відкриття.',
+        message: 'Required fields: location, title, text and unlock date.',
       });
       return;
     }
@@ -503,7 +503,7 @@ apiRouter.post(
     if (!media_id) {
       res.status(400).json({
         error: 'INVALID_SPOTLIGHT',
-        message: 'Потрібен параметр media_id.',
+        message: 'media_id parameter required.',
       });
       return;
     }

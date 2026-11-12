@@ -14,6 +14,6 @@ export const registeredGuard: CanActivateFn = () => {
     return true;
   }
 
-  auth.openAuthModal('Увійдіть, щоб переглянути свій Особистий архів спогадів.');
+  auth.openAuthModal('Sign in to view your Personal Archive of Memories.');
   return router.createUrlTree(['/']);
 };

@@ -24,13 +24,13 @@ interface SoundPoint {
       <div class="flex items-start justify-between gap-4">
         <div>
           <span class="text-xs font-mono uppercase tracking-widest text-aethel-audio">
-            Мапа звуків та спогадів
+            Soundscape Map
           </span>
           <h3 class="text-base font-serif text-aethel-cream mt-1">
-            Аудіогеотігування района
+            Audio Geotagging of District
           </h3>
           <p class="text-xs text-aethel-muted mt-1">
-            Звукові точки — голосові історії, шум вулиць, прибій, ранковий гул міста.
+            Sound points — voice stories, street noise, surf, morning city hum.
           </p>
         </div>
         @if (auth.isAuthenticated()) {
@@ -39,7 +39,7 @@ interface SoundPoint {
             (click)="toggleRecord()"
             class="px-4 py-2 rounded-lg bg-aethel-audio text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition"
           >
-            {{ isRecording() ? '⏹ Зупинити запис' : '🎙 Записати звук' }}
+            {{ isRecording() ? '⏹ Stop Recording' : '🎙 Record Sound' }}
           </button>
         } @else {
           <button
@@ -47,7 +47,7 @@ interface SoundPoint {
             (click)="promptGuest()"
             class="px-4 py-2 rounded-lg border border-aethel-audio/60 text-aethel-audio font-medium text-xs hover:bg-aethel-audio hover:text-aethel-bg transition"
           >
-            🎙 Записати (вхід)
+            🎙 Record (Sign In)
           </button>
         }
       </div>
@@ -55,8 +55,8 @@ interface SoundPoint {
       <!-- Map area -->
       <div class="aspect-video rounded-xl border border-aethel-border bg-aethel-bg/30 relative overflow-hidden">
         <div class="absolute inset-0 flex flex-col items-center justify-center text-aethel-muted text-xs font-mono">
-          <span class="mb-2">🗺 Інтерактивна мапа звукових точок</span>
-          <span class="text-[10px] opacity-60">Leaflet / Mapbox інтеграція</span>
+          <span class="mb-2">🗺 Interactive Soundscape Map</span>
+          <span class="text-[10px] opacity-60">Leaflet / Mapbox Integration</span>
         </div>
         <!-- Sound point markers overlay -->
         <div class="absolute inset-0 pointer-events-none">
@@ -86,13 +86,13 @@ interface SoundPoint {
       @if (isRecording()) {
         <div class="p-3 rounded-lg bg-red-900/20 border border-red-500/30 flex items-center gap-3">
           <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-          <span class="text-xs font-mono text-red-200">Запис аудіо триває...</span>
+          <span class="text-xs font-mono text-red-200">Audio recording in progress...</span>
           <button
             type="button"
             (click)="stopRecording()"
             class="ml-auto text-xs font-mono text-red-400 hover:text-red-200 underline"
           >
-            Зупинити
+            Stop
           </button>
         </div>
       }
@@ -100,7 +100,7 @@ interface SoundPoint {
       <!-- Sound points list -->
       <div class="space-y-2">
         <h4 class="text-xs font-mono uppercase tracking-widest text-aethel-muted">
-          Звукові точки ({{ soundPoints().length }})
+          Sound Points ({{ soundPoints().length }})
         </h4>
         <div class="space-y-2">
           @for (point of soundPoints(); track point.id) {
@@ -123,7 +123,7 @@ interface SoundPoint {
                 <div class="flex items-center gap-2">
                   @if (point.duration) {
                     <span class="text-[10px] font-mono text-aethel-muted">
-                      {{ point.duration }}с
+                      {{ point.duration }}s
                     </span>
                   }
                   <audio
@@ -132,7 +132,7 @@ interface SoundPoint {
                     controls
                     list="audio-default"
                   >
-                    Ваш браузер не підтримує аудіоплеєр.
+                    Your browser does not support audio player.
                   </audio>
                 </div>
               </div>
@@ -141,7 +141,7 @@ interface SoundPoint {
           @if (soundPoints().length === 0) {
             <div class="p-4 rounded-lg border border-aethel-border/30 bg-aethel-bg/30 text-center">
               <p class="text-xs text-aethel-muted">
-                Ще немає звукових точок. Запишіть перший шум вашого району.
+                No sound points yet. Record the first sound of your district.
               </p>
             </div>
           }
@@ -163,8 +163,8 @@ export class AudioMapComponent {
   private readonly _soundPoints = signal<SoundPoint[]>([
     {
       id: 'sp-1',
-      title: 'Ранковий туман над Контрактовою',
-      location: 'Київ → Поділ',
+      title: 'Morning Fog over Kontraktova',
+      location: 'Kyiv → Podil',
       lat: 50.4688,
       lng: 30.5161,
       audioUrl: '',
@@ -174,8 +174,8 @@ export class AudioMapComponent {
     },
     {
       id: 'sp-2',
-      title: 'Дощовий вечір на Площі Ринок',
-      location: 'Львів → Центр',
+      title: 'Rainy Evening at Rynok Square',
+      location: 'Lviv → Center',
       lat: 49.8419,
       lng: 24.0315,
       audioUrl: '',
@@ -232,13 +232,13 @@ export class AudioMapComponent {
 
         const point: SoundPoint = {
           id: `sp-${Date.now()}`,
-          title: `Запис ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}`,
-          location: 'Нова точка',
+          title: `Recording ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
+          location: 'New Point',
           lat: 50.4501,
           lng: 30.5234,
           audioUrl,
           duration,
-          author: 'Ви',
+          author: 'You',
           createdAt: new Date().toISOString(),
         };
 
@@ -262,6 +262,6 @@ export class AudioMapComponent {
   }
 
   promptGuest(): void {
-    this.auth.openAuthModal('Увійдіть, щоб записувати звукові точки.');
+    this.auth.openAuthModal('Sign in to record sound points.');
   }
 }
