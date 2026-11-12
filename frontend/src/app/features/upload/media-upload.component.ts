@@ -16,7 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <section class="p-6 rounded-xl border border-aethel-upload bg-aethel-surface space-y-5">
+    <section class="p-8 rounded-xl border border-aethel-upload bg-aethel-surface space-y-6">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -48,8 +48,8 @@ import { AuthService } from '../../core/services/auth.service';
 
       <!-- Guest Mode Notice -->
       @if (!auth.isAuthenticated()) {
-        <div class="p-4 rounded-lg border border-aethel-upload/30 bg-aethel-bg/30 flex items-start gap-3">
-          <span class="text-aethel-muted">👁</span>
+        <div class="p-5 rounded-lg border border-aethel-upload/30 bg-aethel-bg/30 flex items-start gap-4">
+          <span class="text-aethel-muted text-sm">👁</span>
           <div>
             <div class="text-xs font-mono text-aethel-muted">
               Guest Mode · Author nicknames hidden for privacy protection
@@ -63,8 +63,8 @@ import { AuthService } from '../../core/services/auth.service';
 
       <!-- Upload Form (Registered users only) -->
       @if (isOpen() && auth.isAuthenticated()) {
-        <form (ngSubmit)="onSubmit()" class="space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <form (ngSubmit)="onSubmit()" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-3">
             <div class="col-span-2 sm:col-span-1">
               <label class="block text-xs font-mono text-aethel-muted mb-1.5">
                 Media File (photo or video)
