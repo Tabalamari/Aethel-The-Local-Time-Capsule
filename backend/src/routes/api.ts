@@ -6,7 +6,7 @@ import {
   requireRegisteredUser,
 } from '../middleware/authPrivacy';
 import { isSupabaseConfigured, supabaseAdmin } from '../config/supabase';
-import { FutureLetterDTO, LocationItem, MediaItemDTO } from '../types/models';
+import { FutureLetterDTO, LocationItem, MediaItemDTO, CommentDTO, DirectMessageDTO } from '../types/models';
 import { profileRouter, localDemoProfiles } from './profile';
 
 export const apiRouter = Router();
@@ -508,7 +508,7 @@ apiRouter.post(
     }
 
     if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
+      const { data, error }: any = await supabaseAdmin
         .from('media_items')
         .insert({
           author_id: userId,
@@ -853,7 +853,7 @@ apiRouter.post(
     const isUnlocked = unlock_date <= todayIso;
 
     if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
+      const { data, error }: any = await supabaseAdmin
         .from('future_letters')
         .insert({
           author_id: userId,

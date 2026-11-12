@@ -113,7 +113,7 @@ interface SoundPoint {
                   <div class="flex items-center gap-2 mb-1">
                     <span class="text-xs font-mono text-aethel-gold font-semibold">{{ point.title }}</span>
                     @if (point.author) {
-                      <span class="text-[10px] font-mono text-a-muted">@{{ point.author }}</span>
+                      <span class="text-[10px] font-mono text-a-muted">                      {{ point.author }}</span>
                     }
                   </div>
                   <div class="text-[10px] font-mono text-aethel-muted">
@@ -152,7 +152,7 @@ interface SoundPoint {
 })
 export class AudioMapComponent {
   private readonly api = inject(ApiService);
-  private readonly auth = inject(AuthService);
+  readonly auth = inject(AuthService);
 
   readonly isRecording = signal(false);
   readonly selectedPoint = signal<SoundPoint | null>(null);

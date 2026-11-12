@@ -158,12 +158,15 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class MediaUploadComponent {
   private readonly api = inject(ApiService);
-  private readonly auth = inject(AuthService);
+  readonly auth = inject(AuthService);
 
   @Input() set locations(value: LocationEntry[]) {
     this._locations.set(value || []);
   }
-  readonly locations = this._locations.asReadonly();
+
+  get locations() {
+    return this._locations();
+  }
   private readonly _locations = signal<LocationEntry[]>([]);
 
   @Output() readonly uploadComplete = new EventEmitter<MediaSnapshot>();

@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    @if (badge() && badge().is_partner && badge().partner_badge_label) {
+    @if (badge()?.is_partner && badge()?.partner_badge_label) {
       <span
         class="text-[10px] px-2 py-0.5 rounded border border-aethel-amber/40 text-aethel-amber font-mono font-semibold"
         [title]="badge().partner_badge_label"

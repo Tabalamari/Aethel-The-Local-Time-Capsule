@@ -9,7 +9,7 @@ import { interval } from 'rxjs';
   template: `
     <section
       class="p-6 rounded-xl border border-aethel-border bg-aethel-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
-      [class.border-aethel-amber/50]="isUnlocked()"
+      [class.border-aethel-amber]="isUnlocked()"
     >
       <div class="space-y-2">
         <div
@@ -20,8 +20,8 @@ import { interval } from 'rxjs';
             Капсула часу
           </span>
         </div>
-        <h2 class="text-xl font-serif text-aethel-cream">{{ vaultTitle() }}</h2>
-        <p class="text-sm text-aethel-muted max-w-xl">{{ vaultDescription() }}</p>
+        <h2 class="text-xl font-serif text-aethel-cream">{{ vaultTitle }}</h2>
+        <p class="text-sm text-aethel-muted max-w-xl">{{ vaultDescription }}</p>
       </div>
 
       <div class="text-right font-mono bg-aethel-bg px-5 py-3 rounded-lg border border-aethel-border">

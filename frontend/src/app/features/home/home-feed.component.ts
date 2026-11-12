@@ -46,7 +46,7 @@ import { PartnerBadgeComponent } from '../partner-badge/partner-badge.component'
       ></app-vault-timer>
 
       <!-- Stage 6: Sponsored Spotlight (Paid Featured Items) -->
-      <app-sponsored-spotlight (openPayment)="openPayment($event)"></app-sponsored-spotlight>
+      <app-sponsored-spotlight (openPayment)="openPayment()"></app-sponsored-spotlight>
 
       <!-- Stage 3: Location Filter Bar -->
       <app-location-filter-bar

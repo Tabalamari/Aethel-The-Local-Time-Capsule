@@ -38,7 +38,7 @@ import { AuthService } from '../../core/services/auth.service';
                     </div>
                     @if (spot.author_username) {
                       <div class="flex items-center gap-1 mt-1">
-                        <span class="text-[10px] font-mono text-aethel-gold">@{{ spot.author_username }}</span>
+                        <span class="text-[10px] font-mono text-aethel-gold">                        {{ spot.author_username }}</span>
                         @if (spot.author_partner_badge) {
                           <span class="text-[10px] px-1.5 py-0.5 rounded border border-aethel-amber/40 text-aethel-amber">
                             {{ spot.author_partner_badge }}
@@ -90,7 +90,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class SponsoredSpotlightComponent {
   private readonly api = inject(ApiService);
-  private readonly auth = inject(AuthService);
+  readonly auth = inject(AuthService);
 
   readonly spotlights = signal<SpotlightDTO[]>([]);
   readonly paymentOpen = signal(false);

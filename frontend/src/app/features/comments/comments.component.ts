@@ -33,7 +33,7 @@ import { AuthService } from '../../core/services/auth.service';
               <div>
                 @if (comment.author_username) {
                   <span class="text-xs font-mono font-semibold text-aethel-gold">
-                    @{{ comment.author_username }}
+                    {{ comment.author_username }}
                   </span>
                 } @else {
                   <span class="text-xs font-mono text-aethel-muted italic">
@@ -91,7 +91,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class CommentsComponent {
   private readonly api = inject(ApiService);
-  private readonly auth = inject(AuthService);
+  readonly auth = inject(AuthService);
 
   @Input() mediaId = '';
 

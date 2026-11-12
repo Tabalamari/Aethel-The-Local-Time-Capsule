@@ -15,11 +15,11 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="p-4 border-b border-aethel-border bg-aethel-bg flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-full bg-aethel-amber/20 flex items-center justify-center text-aethel-gold text-xs font-mono">
-            @{{ partnerUsername() }}
+            {{ partnerUsername() }}
           </div>
           <div>
             <h3 class="text-sm font-serif text-aethel-cream font-semibold">
-              @{{ partnerUsername() }}
+              {{ partnerUsername() }}
             </h3>
             <p class="text-[10px] text-aethel-muted">
               Приватне повідомлення
