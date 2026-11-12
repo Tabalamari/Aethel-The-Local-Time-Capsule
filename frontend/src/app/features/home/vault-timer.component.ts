@@ -17,7 +17,7 @@ import { interval } from 'rxjs';
         >
           <span [class.text-aethel-gold]="isUnlocked()">
             {{ isUnlocked() ? '🔓' : '🔒' }}
-            Капсула часу
+            Time Capsule
           </span>
         </div>
         <h2 class="text-xl font-serif text-aethel-cream">{{ vaultTitle }}</h2>
@@ -26,18 +26,18 @@ import { interval } from 'rxjs';
 
       <div class="text-right font-mono bg-aethel-bg px-5 py-3 rounded-lg border border-aethel-border">
         <div class="text-xs text-aethel-muted uppercase">
-          {{ isUnlocked() ? 'Капсула відкрита' : 'Відкриття капсули' }}
+          {{ isUnlocked() ? 'Capsule Opened' : 'Capsule Opening' }}
         </div>
         @if (isUnlocked()) {
           <div class="text-lg text-aethel-gold font-semibold">
-            Капсула часу відкрита для всіх мешканців
+            Time capsule opened for all residents
           </div>
         } @else {
           <div class="text-2xl text-aethel-gold font-semibold tabular-nums">
             {{ days() }}d {{ hours() }}h {{ minutes() }}m {{ seconds() }}s
           </div>
           <div class="text-xs text-aethel-muted mt-1">
-            до публічного доступу до усіх спогадів
+            until public access to all memories
           </div>
         }
       </div>
@@ -46,9 +46,9 @@ import { interval } from 'rxjs';
 })
 export class VaultTimerComponent {
   @Input() unlockAt = '';
-  @Input() vaultTitle = 'Велика Капсула Часу Міста — 2030';
+  @Input() vaultTitle = 'Great City Time Capsule — 2030';
   @Input() vaultDescription =
-    'Спільний цифровий сейф спогадів, ранкових фото, голосів вулиць та листів у майбутнє.';
+    'Shared digital vault of memories, morning photos, street voices and letters to the future.';
 
   private readonly unlockTime = signal<Date | null>(null);
 

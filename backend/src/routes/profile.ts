@@ -15,7 +15,7 @@ export const localDemoProfiles = new Map<string, UserProfile>([
       id: 'demo-user-1',
       username: 'podil_archivist',
       role: 'partner_guardian',
-      partner_badge_label: 'Хранитель історії · Кав’ярня Світлиця',
+      partner_badge_label: 'Keeper of History · Svitlytsia Cafe',
       created_at: new Date().toISOString(),
     },
   ],
@@ -41,7 +41,7 @@ profileRouter.get('/check-username', async (req: AuthenticatedRequest, res: Resp
   const raw = typeof req.query.username === 'string' ? req.query.username.trim() : '';
 
   if (!raw) {
-    res.json({ available: false, reason: 'EMPTY', message: 'Введіть нікнейм' });
+    res.json({ available: false, reason: 'EMPTY', message: 'Enter nickname' });
     return;
   }
 
@@ -49,7 +49,7 @@ profileRouter.get('/check-username', async (req: AuthenticatedRequest, res: Resp
     res.json({
       available: false,
       reason: 'INVALID_FORMAT',
-      message: 'Нікнейм має містити від 3 до 32 символів (латиниця, цифри, _, ., -)',
+      message: 'Nickname must contain 3-32 characters (Latin letters, digits, _, ., -)',
     });
     return;
   }
@@ -68,7 +68,7 @@ profileRouter.get('/check-username', async (req: AuthenticatedRequest, res: Resp
   res.json({
     available: !taken,
     reason: taken ? 'TAKEN' : 'OK',
-    message: taken ? 'Цей нікнейм вже зайнятий' : 'Нікнейм вільний',
+    message: taken ? 'This nickname is already taken' : 'Nickname is available',
   });
 });
 
@@ -104,7 +104,7 @@ profileRouter.post(
     if (!USERNAME_REGEX.test(rawUsername)) {
       res.status(400).json({
         error: 'INVALID_USERNAME',
-        message: 'Нікнейм має містити від 3 до 32 символів (латиниця, цифри, _, ., -)',
+        message: 'Nickname must contain 3-32 characters (Latin letters, digits, _, ., -)',
       });
       return;
     }
@@ -114,7 +114,7 @@ profileRouter.post(
       if (prof.username.toLowerCase() === rawUsername.toLowerCase() && uid !== userId) {
         res.status(409).json({
           error: 'USERNAME_TAKEN',
-          message: 'Цей унікальний нікнейм вже використовується іншим мешканцем.',
+          message: 'This unique nickname is already used by another resident.',
         });
         return;
       }

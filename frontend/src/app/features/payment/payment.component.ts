@@ -23,13 +23,13 @@ export interface PaymentOption {
       <div class="flex items-center justify-between gap-3">
         <div>
           <span class="text-xs font-mono uppercase tracking-widest text-aethel-amber">
-            Оплата місця на головній
+            Pay for Spot on Home
           </span>
           <h3 class="text-base font-serif text-aethel-cream mt-1">
             Sponsored Spotlight
           </h3>
           <p class="text-xs text-aethel-muted mt-1">
-            Закріпте свій спогад або привітання угорі головної стрічки на обраний термін.
+            Pin your memory or greeting at the top of the home feed for a chosen period.
           </p>
         </div>
         <button
@@ -66,9 +66,9 @@ export class PaymentComponent {
   readonly selectedProvider = signal<PaymentProvider | null>(null);
 
   readonly paymentOptions: PaymentOption[] = [
-    { id: 'stripe', name: 'Stripe', description: 'Картки Visa/Mastercard', color: '#6358F0', icon: '💳' },
-    { id: 'liqpay', name: 'LiqPay', description: 'Українські картки', color: '#FF3B30', icon: '🇺🇦' },
-    { id: 'monobank', name: 'Monobank', description: 'Монобанк Acquiring', color: '#FF8C00', icon: '🟠' },
+    { id: 'stripe', name: 'Stripe', description: 'Visa/Mastercard Cards', color: '#6358F0', icon: '💳' },
+    { id: 'liqpay', name: 'LiqPay', description: 'Ukrainian Cards', color: '#FF3B30', icon: '🇺🇦' },
+    { id: 'monobank', name: 'Monobank', description: 'Monobank Acquiring', color: '#FF8C00', icon: '🟠' },
   ];
 
   reset(): void {

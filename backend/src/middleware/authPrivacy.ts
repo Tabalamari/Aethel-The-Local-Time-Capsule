@@ -9,8 +9,8 @@ export interface AuthenticatedRequest extends Request {
 }
 
 /**
- * Demo auth: токен у форматі demo-user-<id> розглядається як зареєстрований користувач.
- * Гості мають isRegistered = false.
+ * Demo auth: token in format demo-user-<id> is considered a registered user.
+ * Guests have isRegistered = false.
  */
 export function attachViewerContext(
   req: AuthenticatedRequest,
@@ -49,7 +49,7 @@ export function requireRegisteredUser(
   if (!req.viewer?.isRegistered || !req.viewer.id) {
     res.status(401).json({
       error: 'AUTH_REQUIRED',
-      message: 'Увійдіть та оберіть унікальний нікнейм для виконання цієї дії.',
+      message: 'Sign in and choose a unique nickname to perform this action.',
     });
     return;
   }
@@ -65,7 +65,7 @@ export function forbidPublicAuthorFilter(
     res.status(403).json({
       error: 'AUTHOR_FILTER_FORBIDDEN',
       message:
-        'Вибірка публікацій за конкретним автором заборонена правилами приватності капсули часу.',
+        'Filtering posts by specific author is forbidden by time capsule privacy rules.',
     });
     return;
   }

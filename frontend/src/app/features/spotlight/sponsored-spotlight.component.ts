@@ -16,7 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
           <div class="relative z-10 flex flex-col sm:flex-row gap-4 p-3 sm:p-4">
             <div class="flex-shrink-0">
               <span class="text-[10px] font-mono uppercase tracking-wider text-aethel-amber font-semibold">
-                ⭐ Піднято на головну
+                ⭐ Pinned to Home
               </span>
               <h3 class="text-sm font-serif text-aethel-cream mt-1 font-semibold">
                 Sponsored Spotlight
@@ -34,7 +34,7 @@ import { AuthService } from '../../core/services/auth.service';
                       {{ spot.location?.city }} → {{ spot.location?.district }}
                     </div>
                     <div class="text-xs font-serif text-aethel-cream/90 truncate leading-tight">
-                      {{ spot.caption || 'Закріплений спогад' }}
+                      {{ spot.caption || 'Pinned Memory' }}
                     </div>
                     @if (spot.author_username) {
                       <div class="flex items-center gap-1 mt-1">
@@ -55,33 +55,33 @@ import { AuthService } from '../../core/services/auth.service';
                 (click)="openPayment()"
                 class="text-[10px] font-mono text-aethel-amber underline underline-offset-2 hover:text-aethel-gold transition px-3 py-1.5 rounded border border-aethel-amber/30 hover:bg-aethel-amber/20"
               >
-                Купити місце
+Buy a Spot
               </button>
             </div>
           </div>
         </div>
 
         <div class="flex items-center justify-between gap-3">
-          <h4 class="text-xs font-mono uppercase tracking-widest text-aethel-muted">
-            Закріплені спогади ({{ spotlights().length }})
-          </h4>
+<h4 class="text-xs font-mono uppercase tracking-widest text-aethel-muted">
+          Pinned Memories ({{ spotlights().length }})
+        </h4>
           <button
             (click)="openPayment()"
             class="text-[10px] font-mono text-aethel-amber underline underline-offset-2 hover:text-aethel-gold transition"
           >
-            Купити місце →
+            Buy a Spot →
           </button>
         </div>
       } @else if (auth.isAuthenticated()) {
         <div class="p-4 rounded-xl border border-aethel-border/30 bg-aethel-bg/30 text-center">
-          <p class="text-xs text-aethel-muted">
-            Ще немає закріплених спогадів. Будьте першим!
-          </p>
+<p class="text-xs text-aethel-muted">
+              No pinned memories yet. Be the first!
+            </p>
           <button
             (click)="openPayment()"
             class="mt-3 text-[10px] font-mono text-aethel-amber underline underline-offset-2 hover:text-aethel-gold transition px-3 py-1.5 rounded border border-aethel-amber/30 hover:bg-aethel-amber/20"
           >
-            Купити місце на головній
+            Buy a Spot on Home Page
           </button>
         </div>
       }

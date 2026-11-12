@@ -20,10 +20,10 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="flex items-start justify-between gap-4">
         <div>
           <span class="text-xs font-mono uppercase tracking-widest text-aethel-upload">
-            Додавання знімку
+            Adding Memory
           </span>
           <h3 class="text-base font-serif text-aethel-cream mt-1">
-            Завантажте фото або відео капсули часу
+            Upload photo or video to the time capsule
           </h3>
         </div>
         @if (auth.isAuthenticated()) {
@@ -32,7 +32,7 @@ import { AuthService } from '../../core/services/auth.service';
             (click)="toggleUpload()"
             class="text-xs font-mono px-3 py-1.5 rounded border border-aethel-upload/60 text-aethel-upload hover:bg-aethel-upload hover:text-aethel-bg transition"
           >
-            {{ isOpen() ? '✕ Скасувати' : '+ Завантажити медіа' }}
+            {{ isOpen() ? '✕ Cancel' : '+ Upload Media' }}
           </button>
         } @else {
           <button
@@ -40,7 +40,7 @@ import { AuthService } from '../../core/services/auth.service';
             (click)="promptGuest()"
             class="text-xs font-mono px-3 py-1.5 rounded border border-aethel-upload/60 text-aethel-upload hover:bg-aethel-upload hover:text-aethel-bg transition"
           >
-            + Завантажити (вхід)
+            + Upload (Sign In)
           </button>
         }
       </div>
@@ -50,7 +50,7 @@ import { AuthService } from '../../core/services/auth.service';
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="col-span-2 sm:col-span-1">
               <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-                Медіафайл (фото або відео)
+                Media File (photo or video)
               </label>
               <div class="relative group" (click)="fileInput.click()">
                 <input
@@ -77,9 +77,9 @@ import { AuthService } from '../../core/services/auth.service';
                     </button>
                   } @else {
                     <div class="flex flex-col items-center justify-center h-full text-aethel-muted">
-                      <span class="text-xs font-mono mb-2">Натисніть, щоб вибрати файл</span>
+                      <span class="text-xs font-mono mb-2">Click to select file</span>
                       <span class="text-[10px] font-mono opacity-50">
-                        Фото · Відео (до 2–3 хв)
+                        Photo · Video (up to 2-3 min)
                       </span>
                     </div>
                   }
@@ -92,7 +92,7 @@ import { AuthService } from '../../core/services/auth.service';
 
             <div>
               <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-                Локація
+                Location
               </label>
               <select
                 [(ngModel)]="selectedLocationId"
@@ -100,7 +100,7 @@ import { AuthService } from '../../core/services/auth.service';
                 required
                 class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-upload"
               >
-                <option value="">Оберіть район</option>
+                <option value="">Select district</option>
                 @for (loc of locations(); track loc.id) {
                   <option [value]="loc.id">
                     {{ loc.country }} → {{ loc.city }} → {{ loc.district }}
@@ -111,7 +111,7 @@ import { AuthService } from '../../core/services/auth.service';
 
             <div class="sm:col-span-1">
               <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-                Дата створення
+                Creation Date
               </label>
               <input
                 type="date"
@@ -124,21 +124,21 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
 
           <div>
-            <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-              Підпис (необов'язково)
-            </label>
+<label class="block text-xs font-mono text-aethel-muted mb-1.5">
+                Caption (optional)
+              </label>
             <textarea
               [(ngModel)]="caption"
               name="caption"
               rows="3"
-              placeholder="Ранкова кава біля трамвайної колії..."
+              placeholder="Morning coffee by the tram tracks..."
               class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-upload"
             ></textarea>
           </div>
 
           <div class="flex items-center justify-between pt-2">
             @if (isUploading()) {
-              <span class="text-xs font-mono text-aethel-upload">Завантаження...</span>
+              <span class="text-xs font-mono text-aethel-upload">Saving...</span>
             } @else if (uploadStatus()) {
               <span class="text-xs font-mono text-aethel-upload">{{ uploadStatus() }}</span>
             }
@@ -148,7 +148,7 @@ import { AuthService } from '../../core/services/auth.service';
               [disabled]="!canUpload() || isUploading()"
               class="px-4 py-2 rounded-lg bg-aethel-upload text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Зберегти знімок
+              Save Memory
             </button>
           </div>
         </form>
@@ -190,7 +190,7 @@ export class MediaUploadComponent {
   }
 
   promptGuest(): void {
-    this.auth.openAuthModal('Увійдіть, щоб завантажувати медіафайли до капсули часу.');
+    this.auth.openAuthModal('Sign in to upload media files to the time capsule.');
   }
 
   onFileSelected(event: Event): void {
@@ -204,14 +204,14 @@ export class MediaUploadComponent {
     const isImage = file.type.startsWith('image/');
 
     if (!isVideo && !isImage) {
-      this.validationError.set('Лише фото або відео файли дозволені.');
+      this.validationError.set('Only photo or video files allowed.');
       return;
     }
 
     const maxSizeMB = isVideo ? 100 : 10;
     if (file.size > maxSizeMB * 1024 * 1024) {
       this.validationError.set(
-        `Файл занадто великий (макс. ${maxSizeMB} MB для ${isVideo ? 'відео' : 'зображення'}).`
+        `File too large (max ${maxSizeMB} MB for ${isVideo ? 'video' : 'image'}).`
       );
       return;
     }
@@ -244,7 +244,7 @@ export class MediaUploadComponent {
         const duration = video.duration;
         const maxSeconds = 180;
         if (duration > maxSeconds) {
-          resolve(`Відео занадто довге (макс. 3 хвилини, зараз ${Math.round(duration)}с).`);
+          resolve(`Video too long (max 3 minutes, now ${Math.round(duration)}s).`);
         } else {
           resolve(null);
         }
@@ -287,7 +287,7 @@ export class MediaUploadComponent {
     if (!this.canUpload()) return;
 
     this.isUploading.set(true);
-    this.uploadStatus.set('Збереження знімку...');
+    this.uploadStatus.set('Saving memory...');
     this.validationError.set(null);
 
     try {
@@ -307,13 +307,13 @@ export class MediaUploadComponent {
       const created = await this.api.createMedia(result).toPromise();
 
       if (created) {
-        this.uploadStatus.set('Збережено!');
+        this.uploadStatus.set('Saved!');
         this.uploadComplete.emit(created);
         this.resetForm();
         this.isOpen.set(false);
       }
     } catch (err: any) {
-      this.validationError.set(err?.error?.message || 'Не вдалося завантажити медіафайл.');
+      this.validationError.set(err?.error?.message || 'Failed to upload media file.');
     } finally {
       this.isUploading.set(false);
     }

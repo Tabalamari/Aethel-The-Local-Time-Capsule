@@ -12,7 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
     <section class="space-y-4">
       <div class="flex items-center justify-between gap-3">
         <h4 class="text-xs font-mono uppercase tracking-widest text-aethel-muted">
-          Коментарі ({{ comments().length }})
+          Comments ({{ comments().length }})
         </h4>
         @if (!auth.isAuthenticated()) {
           <button
@@ -20,7 +20,7 @@ import { AuthService } from '../../core/services/auth.service';
             (click)="promptGuest()"
             class="text-[10px] font-mono text-aethel-amber hover:underline px-2 py-1"
           >
-            Увійдіть, щоб коментувати
+            Sign in to comment
           </button>
         }
       </div>
@@ -37,7 +37,7 @@ import { AuthService } from '../../core/services/auth.service';
                   </span>
                 } @else {
                   <span class="text-xs font-mono text-aethel-muted italic">
-                    Анонімний мешканець
+                    Anonymous Resident
                   </span>
                 }
                 <span class="text-[10px] font-mono text-aethel-muted ml-2">
@@ -53,7 +53,7 @@ import { AuthService } from '../../core/services/auth.service';
         @if (comments().length === 0) {
           <div class="p-4 rounded-lg border border-aethel-border/30 bg-aethel-bg/30 text-center">
             <p class="text-xs text-aethel-muted">
-              Ще немає коментарів. Будьте першим, хто залишить свій відгук.
+              No comments yet. Be the first to leave a review.
             </p>
           </div>
         }
@@ -67,7 +67,7 @@ import { AuthService } from '../../core/services/auth.service';
               [(ngModel)]="commentText"
               name="content"
               rows="2"
-              placeholder="Напишіть свій коментар..."
+              placeholder="Write your comment..."
               required
               class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
             ></textarea>
@@ -77,7 +77,7 @@ import { AuthService } from '../../core/services/auth.service';
                 [disabled]="isPosting()"
                 class="absolute right-2 top-2 px-3 py-1.5 bg-aethel-amber text-aethel-bg text-[10px] font-medium rounded hover:bg-aethel-gold transition disabled:opacity-40"
               >
-                Надіслати
+                Send
               </button>
             }
           </div>
@@ -119,7 +119,7 @@ export class CommentsComponent {
   }
 
   promptGuest(): void {
-    this.auth.openAuthModal('Увійдіть, щоб залишити коментар.');
+    this.auth.openAuthModal('Sign in to leave a comment.');
   }
 
   async onSubmit(): Promise<void> {
@@ -138,7 +138,7 @@ export class CommentsComponent {
         this.commentText = '';
       }
     } catch (err: any) {
-      this.postError.set(err?.error?.message || 'Не вдалося надіслати коментар.');
+      this.postError.set(err?.error?.message || 'Failed to send comment.');
     } finally {
       this.isPosting.set(false);
     }

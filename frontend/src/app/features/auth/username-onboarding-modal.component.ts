@@ -15,21 +15,21 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="w-full max-w-md rounded-2xl border border-aethel-amber/60 bg-aethel-surface p-6 shadow-2xl space-y-5">
           <div>
             <span class="text-xs font-mono uppercase tracking-widest text-aethel-amber">
-              Крок 1 із 1 · Приватність мешканця
+              Step 1 of 1 · Resident Privacy
             </span>
             <h2 class="text-xl font-serif text-aethel-cream mt-1">
-              Оберіть свій унікальний нікнейм
+              Choose your unique nickname
             </h2>
             <p class="text-xs text-aethel-muted mt-1 leading-relaxed">
-              Цей нікнейм відображатиметься біля ваших спогадів лише для зареєстрованих учасників.
-              Для гостей сайту всі автори залишаються повністю прихованими.
+              This nickname will be displayed next to your memories only for registered participants.
+              All authors remain completely hidden for site guests.
             </p>
           </div>
 
           <form (ngSubmit)="onSubmit()" class="space-y-4">
             <div>
               <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-                Унікальний нікнейм (латиниця, цифри, _, ., -)
+                Unique nickname (Latin letters, digits, _, ., -)
               </label>
               <div class="relative flex items-center">
                 <span class="absolute left-3.5 text-aethel-muted font-mono text-sm">&#64;</span>
@@ -47,7 +47,7 @@ import { AuthService } from '../../core/services/auth.service';
 
               @if (checking()) {
                 <p class="text-xs font-mono text-aethel-muted mt-2">
-                  Перевірка унікальності нікнейму...
+                  Checking nickname uniqueness...
                 </p>
               } @else if (checkMessage()) {
                 <p
@@ -72,7 +72,7 @@ import { AuthService } from '../../core/services/auth.service';
                 (click)="auth.signOut()"
                 class="text-xs font-mono text-aethel-muted hover:text-aethel-cream"
               >
-                Скасувати та вийти
+                Cancel and Sign Out
               </button>
 
               <button
@@ -80,7 +80,7 @@ import { AuthService } from '../../core/services/auth.service';
                 [disabled]="!isAvailable() || saving()"
                 class="px-5 py-2.5 rounded-lg bg-aethel-amber text-aethel-bg font-medium text-sm hover:bg-aethel-gold transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {{ saving() ? 'Збереження...' : 'Зберегти нікнейм' }}
+                {{ saving() ? 'Saving...' : 'Save Nickname' }}
               </button>
             </div>
           </form>
@@ -121,7 +121,7 @@ export class UsernameOnboardingModalComponent implements OnDestroy {
         error: () => {
           this.checking.set(false);
           this.isAvailable.set(false);
-          this.checkMessage.set('Помилка перевірки нікнейму');
+          this.checkMessage.set('Nickname check error');
         },
       });
   }
@@ -151,7 +151,7 @@ export class UsernameOnboardingModalComponent implements OnDestroy {
       },
       error: (err) => {
         this.saving.set(false);
-        this.submitError.set(err?.error?.message || 'Не вдалося зберегти нікнейм');
+        this.submitError.set(err?.error?.message || 'Failed to save nickname');
       },
     });
   }

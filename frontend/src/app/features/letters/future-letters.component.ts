@@ -14,13 +14,13 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-aethel-letters">
         <div>
           <span class="text-xs font-mono uppercase tracking-widest text-aethel-letters">
-            Листи в майбутнє
+            Letters to the Future
           </span>
           <h2 class="text-2xl font-serif text-aethel-cream mt-1">
-            Послання мешканців у майбутнє
+            Residents Messages to the Future
           </h2>
           <p class="text-xs text-aethel-muted mt-1">
-            Напишіть листа, який відчинитьься у обрану вами дату.
+            Write a letter that will open on your chosen date.
           </p>
         </div>
         <div *ngIf="auth.isAuthenticated()">
@@ -29,7 +29,7 @@ import { AuthService } from '../../core/services/auth.service';
             (click)="toggleWriteForm()"
             class="px-4 py-2 rounded-lg bg-aethel-letters text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition"
           >
-            {{ showWriteForm() ? '✕ Скасувати' : '+ Написати листа' }}
+            {{ showWriteForm() ? '✕ Cancel' : '+ Write a Letter' }}
           </button>
         </div>
         <div *ngIf="!auth.isAuthenticated()">
@@ -38,7 +38,7 @@ import { AuthService } from '../../core/services/auth.service';
             (click)="promptGuest()"
             class="px-4 py-2 rounded-lg border border-aethel-letters/60 text-aethel-letters font-medium text-xs hover:bg-aethel-letters hover:text-aethel-bg transition"
           >
-            + Написати (вхід)
+            + Write (Sign In)
           </button>
         </div>
       </div>
@@ -47,7 +47,7 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-              Локація
+              Location
             </label>
             <select
               [(ngModel)]="selectedLocationId"
@@ -55,7 +55,7 @@ import { AuthService } from '../../core/services/auth.service';
               required
               class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
             >
-              <option value="">Оберіть район</option>
+              <option value="">Select district</option>
               <option *ngFor="let loc of locations()" [value]="loc.id">
                 {{ loc.country }} → {{ loc.city }} → {{ loc.district }}
               </option>
@@ -63,7 +63,7 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
           <div>
             <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-              Дата відкриття
+              Unlock Date
             </label>
             <input
               type="date"
@@ -77,50 +77,50 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
 
         <div>
-          <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-            Заголовок
-          </label>
-          <input
-            type="text"
-            [(ngModel)]="title"
-            name="title"
-            required
-            maxlength="160"
-            placeholder="Тим, хто гулятиме тут у 2050 році..."
+<label class="block text-xs font-mono text-aethel-muted mb-1.5">
+              Title
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="title"
+              name="title"
+              required
+              maxlength="160"
+              placeholder="To those who will walk here in 2050..."
             class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
           />
         </div>
 
         <div>
-          <label class="block text-xs font-mono text-aethel-muted mb-1.5">
-            Текст листа
-          </label>
-          <textarea
-            [(ngModel)]="content"
-            name="content"
-            rows="6"
-            required
-            placeholder="Ваші слова будуть запечатані до настання дати відкриття..."
+<label class="block text-xs font-mono text-aethel-muted mb-1.5">
+              Letter Text
+            </label>
+            <textarea
+              [(ngModel)]="content"
+              name="content"
+              rows="6"
+              required
+              placeholder="Your words will be sealed until the opening date..."
             class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
           ></textarea>
         </div>
 
         <div class="flex items-center justify-between pt-2">
-          <span *ngIf="isSending()" class="text-xs font-mono text-aethel-letters">Надсилання...</span>
+          <span *ngIf="isSending()" class="text-xs font-mono text-aethel-letters">Sealing...</span>
           <span *ngIf="!isSending() && sendStatus()" class="text-xs font-mono text-aethel-letters">{{ sendStatus() }}</span>
           <button
             type="submit"
             [disabled]="!canSend() || isSending()"
             class="px-4 py-2 rounded-lg bg-aethel-letters text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40"
           >
-            Запечатати листа
+            Seal Letter
           </button>
         </div>
       </form>
 
       <div class="space-y-3">
         <h3 class="text-xs font-mono uppercase tracking-widest text-aethel-muted">
-          Листи ({{ letters().length }})
+          Letters ({{ letters().length }})
         </h3>
         <div class="space-y-3">
           <article
@@ -142,12 +142,12 @@ import { AuthService } from '../../core/services/auth.service';
               </div>
               <div class="text-right">
                 <div *ngIf="!letter.is_unlocked" class="text-[10px] font-mono text-aethel-letters font-mono">
-                  Запечатаний до {{ letter.unlock_date }}
+                  Sealed until {{ letter.unlock_date }}
                 </div>
                 <div *ngIf="!letter.is_unlocked" class="text-xs text-aethel-gold tabular-nums mt-1">
                   {{ letterDays(letter.unlockDate()) }}d {{ letterHours(letter.unlockDate()) }}h
                 </div>
-                <div *ngIf="letter.is_unlocked" class="text-xs font-mono text-aethel-gold">Відкрито</div>
+                <div *ngIf="letter.is_unlocked" class="text-xs font-mono text-aethel-gold">Opened</div>
               </div>
             </div>
 
@@ -158,14 +158,14 @@ import { AuthService } from '../../core/services/auth.service';
             </div>
             <div *ngIf="!letter.is_unlocked" class="p-3 rounded-lg border border-aethel-border/30 bg-aethel-bg/30 text-center">
               <span class="text-xs font-mono text-aethel-muted">
-                🔒 Лист запечатаний. Текст буде доступний після {{ letter.unlock_date }}.
+                🔒 Letter sealed. Text will be available after {{ letter.unlock_date }}.
               </span>
             </div>
           </article>
 
           <div *ngIf="letters().length === 0" class="p-8 rounded-xl border border-aethel-border bg-aethel-surface text-center">
             <p class="text-sm text-aethel-muted">
-              Ще немає листів. Напишіть свій перший послання у майбутнє.
+              No letters yet. Write your first message to the future.
             </p>
           </div>
         </div>
@@ -220,7 +220,7 @@ export class FutureLettersComponent {
   }
 
   promptGuest(): void {
-    this.auth.openAuthModal('Увійдіть, щоб писати листи в майбутнє.');
+    this.auth.openAuthModal('Sign in to write letters to the future.');
   }
 
   resetForm(): void {
@@ -245,7 +245,7 @@ export class FutureLettersComponent {
     if (!this.canSend()) return;
 
     this.isSending.set(true);
-    this.sendStatus.set('Запечатування листа...');
+    this.sendStatus.set('Sealing letter...');
 
     try {
       const created = await this.api
@@ -258,13 +258,13 @@ export class FutureLettersComponent {
         .toPromise();
 
       if (created) {
-        this.sendStatus.set('Лист запечатано!');
+        this.sendStatus.set('Letter sealed!');
         this.letters.update((list) => [created, ...list]);
         this.resetForm();
         this.showWriteForm.set(false);
       }
     } catch (err: any) {
-      this.sendStatus.set(err?.error?.message || 'Не вдалося запечатати листа.');
+      this.sendStatus.set(err?.error?.message || 'Failed to seal letter.');
     } finally {
       this.isSending.set(false);
     }

@@ -13,31 +13,31 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-aethel-border">
         <div>
           <span class="text-xs font-mono uppercase tracking-widest text-aethel-amber">
-            Особистий простір мешканця
+            Resident Personal Space
           </span>
           <h2 class="text-2xl font-serif text-aethel-cream mt-1">
-            Особистий архів &#64;{{ auth.profile()?.username || 'user' }}
+            Personal Archive &#64;{{ auth.profile()?.username || 'user' }}
           </h2>
           <p class="text-xs text-aethel-muted mt-1">
-            Тут зібрані всі ваші завантажені фото, відео та звукові точки. Інші користувачі не
-            можуть робити вибірку за конкретним автором у загальній стрічці.
+            All your uploaded photos, videos and sound points are collected here.
+            Other users cannot filter by specific author in the general feed.
           </p>
         </div>
         <a
           routerLink="/"
           class="text-xs font-mono px-4 py-2 rounded-lg border border-aethel-border text-aethel-cream hover:border-aethel-amber transition self-start"
         >
-          ← Повернутися до стрічки міста
+          ← Return to City Feed
         </a>
       </div>
 
       @if (items().length === 0) {
         <div class="p-8 rounded-xl border border-aethel-border bg-aethel-surface text-center space-y-2">
           <p class="text-sm font-serif text-aethel-cream">
-            У вашому особистому архіві поки немає збережених моментів.
+            Your personal archive currently has no saved moments.
           </p>
           <p class="text-xs text-aethel-muted">
-            Додайте свій перший ранковий знімок або звукову точку, щоб зберегти атмосферу вашого району.
+            Add your first morning snapshot or sound point to preserve the atmosphere of your district.
           </p>
         </div>
       } @else {
@@ -47,7 +47,7 @@ import { AuthService } from '../../core/services/auth.service';
               <div class="aspect-video bg-black/40 overflow-hidden relative">
                 <img
                   [src]="item.media_url"
-                  [alt]="item.caption || 'Особистий знімок'"
+                  [alt]="item.caption || 'Personal Snapshot'"
                   class="w-full h-full object-cover"
                   loading="lazy"
                 />
@@ -76,4 +76,3 @@ export class PersonalArchiveComponent implements OnInit {
     this.api.getMyArchive().subscribe((data) => this.items.set(data));
   }
 }
-
