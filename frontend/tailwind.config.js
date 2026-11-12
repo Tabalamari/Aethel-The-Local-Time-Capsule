@@ -5,13 +5,13 @@ module.exports = {
     extend: {
       colors: {
         aethel: {
-          bg: '#161412',
-          surface: '#211E1A',
-          border: '#352F28',
+          bg: '#FAF7F2',
+          surface: '#F3EEE5',
+          border: '#D8CDC0',
           amber: '#D99B52',
-          gold: '#E6BA7E',
-          cream: '#F4EFE6',
-          muted: '#9E9487',
+          gold: '#B07A3A',
+          cream: '#4A4032',
+          muted: '#8B7D70',
         },
       },
       fontFamily: {
