@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabaseAnon, isSupabaseConfigured } from '../config/supabase';
 
 export interface AuthenticatedRequest extends Request {
   viewer?: {
@@ -10,15 +9,14 @@ export interface AuthenticatedRequest extends Request {
 }
 
 /**
- * Extracts optional Bearer token from Authorization header.
- * Guests are allowed to browse public endpoints, but `viewer.isRegistered` will be false
- * so downstream handlers strip author nicknames (`username`).
+ * Demo auth: токен у форматі demo-user-<id> розглядається як зареєстрований користувач.
+ * Гості мають isRegistered = false.
  */
-export async function attachViewerContext(
+export function attachViewerContext(
   req: AuthenticatedRequest,
   _res: Response,
   next: NextFunction
-): Promise<void> {
+): void {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     req.viewer = { id: '', isRegistered: false };
@@ -33,39 +31,16 @@ export async function attachViewerContext(
     return;
   }
 
-  if (!isSupabaseConfigured) {
-    // Development fallback when using demo token
-    if (token.startsWith('demo-user-')) {
-      req.viewer = { id: token, isRegistered: true };
-      next();
-      return;
-    }
-    req.viewer = { id: '', isRegistered: false };
+  if (token.startsWith('demo-user-')) {
+    req.viewer = { id: token, isRegistered: true };
     next();
     return;
   }
 
-  try {
-    const { data, error } = await supabaseAnon.auth.getUser(token);
-    if (error || !data?.user) {
-      req.viewer = { id: '', isRegistered: false };
-    } else {
-      req.viewer = {
-        id: data.user.id,
-        email: data.user.email,
-        isRegistered: true,
-      };
-    }
-  } catch {
-    req.viewer = { id: '', isRegistered: false };
-  }
-
+  req.viewer = { id: '', isRegistered: false };
   next();
 }
 
-/**
- * Requires a registered user for protected mutations (uploads, comments, DMs, personal archive).
- */
 export function requireRegisteredUser(
   req: AuthenticatedRequest,
   res: Response,
@@ -81,10 +56,6 @@ export function requireRegisteredUser(
   next();
 }
 
-/**
- * Blocks filtering the public feed by specific author (PRD section 2:
- * "інші користувачі не можуть робити вибірку за конкретним автором").
- */
 export function forbidPublicAuthorFilter(
   req: AuthenticatedRequest,
   res: Response,
@@ -100,4 +71,3 @@ export function forbidPublicAuthorFilter(
   }
   next();
 }
-

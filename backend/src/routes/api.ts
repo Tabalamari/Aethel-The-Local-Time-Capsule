@@ -5,7 +5,6 @@ import {
   forbidPublicAuthorFilter,
   requireRegisteredUser,
 } from '../middleware/authPrivacy';
-import { isSupabaseConfigured, supabaseAdmin } from '../config/supabase';
 import { FutureLetterDTO, LocationItem, MediaItemDTO, CommentDTO, DirectMessageDTO } from '../types/models';
 import { profileRouter, localDemoProfiles } from './profile';
 
@@ -21,7 +20,7 @@ function normalizePlaceName(value: string): string {
   return collapsed.charAt(0).toUpperCase() + collapsed.slice(1);
 }
 
-// Fallback seed data when Supabase .env is not connected yet
+// Fallback seed data
 const SEED_LOCATIONS: LocationItem[] = [
   {
     id: 'loc-kyiv-podil',
@@ -81,20 +80,6 @@ const SEED_LOCATIONS: LocationItem[] = [
 
 // 1. Health & Vault Countdown status
 apiRouter.get('/vault', async (_req: AuthenticatedRequest, res: Response) => {
-  if (isSupabaseConfigured) {
-    const { data, error } = await supabaseAdmin
-      .from('vault_settings')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!error && data) {
-      res.json(data);
-      return;
-    }
-  }
-
   res.json({
     id: 'vault-main-2030',
     vault_title: 'Велика Капсула Часу Міста — 2030',
@@ -107,19 +92,6 @@ apiRouter.get('/vault', async (_req: AuthenticatedRequest, res: Response) => {
 
 // 2. Locations hierarchy (Country -> City -> District)
 apiRouter.get('/locations', async (_req: AuthenticatedRequest, res: Response) => {
-  if (isSupabaseConfigured) {
-    const { data, error } = await supabaseAdmin
-      .from('locations')
-      .select('*')
-      .order('country')
-      .order('city')
-      .order('district');
-
-    if (!error && data) {
-      res.json(data);
-      return;
-    }
-  }
   res.json(SEED_LOCATIONS);
 });
 
@@ -137,45 +109,6 @@ apiRouter.post(
         error: 'INVALID_LOCATION',
         message: 'Будь ласка, вкажіть країну, місто та назву району.',
       });
-      return;
-    }
-
-    if (isSupabaseConfigured) {
-      // Check case-insensitive duplicate first
-      const { data: existing } = await supabaseAdmin
-        .from('locations')
-        .select('*')
-        .ilike('country', country)
-        .ilike('city', city)
-        .ilike('district', district)
-        .maybeSingle();
-
-      if (existing) {
-        res.status(409).json({
-          error: 'LOCATION_EXISTS',
-          message: 'Такий район вже існує у списку локацій.',
-          location: existing,
-        });
-        return;
-      }
-
-      const { data, error } = await supabaseAdmin
-        .from('locations')
-        .insert({
-          country,
-          city,
-          district,
-          created_by: req.viewer!.id,
-        })
-        .select('*')
-        .single();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      res.status(201).json(data);
       return;
     }
 
@@ -211,7 +144,6 @@ apiRouter.post(
 );
 
 // 3. Public Media Feed (Daily Snapshots & Audio Map)
-// Supports cascading location filters (country, city, location_id) & timeline filters (year, month)
 apiRouter.get(
   '/media',
   forbidPublicAuthorFilter,
@@ -219,81 +151,7 @@ apiRouter.get(
     const isRegistered = Boolean(req.viewer?.isRegistered);
     const { country, city, location_id, year, month, media_type } = req.query;
 
-    if (isSupabaseConfigured) {
-      let query = supabaseAdmin
-        .from('media_items')
-        .select(
-          `
-          id,
-          location_id,
-          media_url,
-          media_type,
-          captured_date,
-          caption,
-          duration_seconds,
-          latitude,
-          longitude,
-          is_spotlight,
-          created_at,
-          locations!inner ( country, city, district ),
-          users ( username, role, partner_badge_label )
-        `
-        )
-        .order('is_spotlight', { ascending: false })
-        .order('captured_date', { ascending: false });
-
-      if (typeof location_id === 'string' && location_id) {
-        query = query.eq('location_id', location_id);
-      } else {
-        if (typeof country === 'string' && country) {
-          query = query.eq('locations.country', country);
-        }
-        if (typeof city === 'string' && city) {
-          query = query.eq('locations.city', city);
-        }
-      }
-
-      if (typeof media_type === 'string' && media_type) {
-        query = query.eq('media_type', media_type);
-      }
-
-      if (typeof year === 'string' && year) {
-        const startMonth = typeof month === 'string' && month ? month.padStart(2, '0') : '01';
-        const endMonth = typeof month === 'string' && month ? month.padStart(2, '0') : '12';
-        query = query
-          .gte('captured_date', `${year}-${startMonth}-01`)
-          .lte('captured_date', `${year}-${endMonth}-31`);
-      }
-
-      const { data, error } = await query;
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      const sanitized: MediaItemDTO[] = (data || []).map((row: any) => ({
-        id: row.id,
-        location_id: row.location_id,
-        location: row.locations,
-        media_url: row.media_url,
-        media_type: row.media_type,
-        captured_date: row.captured_date,
-        caption: row.caption,
-        duration_seconds: row.duration_seconds,
-        latitude: row.latitude,
-        longitude: row.longitude,
-        is_spotlight: row.is_spotlight,
-        created_at: row.created_at,
-        author_username: isRegistered ? row.users?.username ?? null : null,
-        author_role: isRegistered ? row.users?.role ?? null : null,
-        author_partner_badge: isRegistered ? row.users?.partner_badge_label ?? null : null,
-      }));
-
-      res.json(sanitized);
-      return;
-    }
-
-    // Fallback demo items with Guest nickname redaction & multi-year/month timeline data
+    // Demo items with Guest nickname redaction & multi-year/month timeline data
     const demoItems: MediaItemDTO[] = [
       {
         id: 'snap-1',
@@ -390,20 +248,6 @@ apiRouter.get(
   requireRegisteredUser,
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.viewer!.id;
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
-        .from('media_items')
-        .select('*, locations ( country, city, district )')
-        .eq('author_id', userId)
-        .order('captured_date', { ascending: false });
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-      res.json(data || []);
-      return;
-    }
 
     const profile = localDemoProfiles.get(userId);
     if (userId === 'demo-user-1' || profile?.username === 'podil_archivist') {
@@ -435,36 +279,6 @@ apiRouter.get(
 // 5. Future Letters (Server-side content lock until unlock_date <= today)
 apiRouter.get('/future-letters', async (req: AuthenticatedRequest, res: Response) => {
   const isRegistered = Boolean(req.viewer?.isRegistered);
-  const todayIso = new Date().toISOString().slice(0, 10);
-
-  if (isSupabaseConfigured) {
-    const { data, error } = await supabaseAdmin
-      .from('future_letters')
-      .select('id, location_id, title, content, unlock_date, created_at, users ( username )')
-      .order('unlock_date', { ascending: true });
-
-    if (error) {
-      res.status(500).json({ error: error.message });
-      return;
-    }
-
-    const letters: FutureLetterDTO[] = (data || []).map((row: any) => {
-      const unlocked = row.unlock_date <= todayIso;
-      return {
-        id: row.id,
-        location_id: row.location_id,
-        title: row.title,
-        content: unlocked ? row.content : null,
-        unlock_date: row.unlock_date,
-        is_unlocked: unlocked,
-        created_at: row.created_at,
-        author_username: isRegistered ? row.users?.username ?? null : null,
-      };
-    });
-
-    res.json(letters);
-    return;
-  }
 
   const demoLetters: FutureLetterDTO[] = [
     {
@@ -507,68 +321,6 @@ apiRouter.post(
       return;
     }
 
-    if (isSupabaseConfigured) {
-      const { data, error }: any = await supabaseAdmin
-        .from('media_items')
-        .insert({
-          author_id: userId,
-          location_id,
-          media_url,
-          media_type,
-          captured_date,
-          caption: caption || null,
-          latitude: latitude || null,
-          longitude: longitude || null,
-          is_spotlight: Boolean(is_spotlight),
-        })
-        .select(
-          `
-          id,
-          location_id,
-          media_url,
-          media_type,
-          captured_date,
-          caption,
-          duration_seconds,
-          latitude,
-          longitude,
-          is_spotlight,
-          created_at,
-          locations!inner ( country, city, district ),
-          users ( username, role, partner_badge_label )
-        `
-        )
-        .single();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      const isRegistered = Boolean(req.viewer?.isRegistered);
-      const sanitized: MediaItemDTO = {
-        id: data.id,
-        location_id: data.location_id,
-        location: data.locations,
-        media_url: data.media_url,
-        media_type: data.media_type,
-        captured_date: data.captured_date,
-        caption: data.caption,
-        duration_seconds: data.duration_seconds,
-        latitude: data.latitude,
-        longitude: data.longitude,
-        is_spotlight: data.is_spotlight,
-        created_at: data.created_at,
-        author_username: isRegistered ? data.users?.username ?? null : null,
-        author_role: isRegistered ? data.users?.role ?? null : null,
-        author_partner_badge: isRegistered ? data.users?.partner_badge_label ?? null : null,
-      };
-
-      res.status(201).json(sanitized);
-      return;
-    }
-
-    // Demo mode
     const created: MediaItemDTO = {
       id: `snap-demo-${Date.now()}`,
       location_id,
@@ -602,32 +354,6 @@ apiRouter.get(
       return;
     }
 
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
-        .from('comments')
-        .select('*, users ( username )')
-        .eq('media_id', media_id)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      const isRegistered = Boolean(_req.viewer?.isRegistered);
-      const comments = (data || []).map((row: any) => ({
-        id: row.id,
-        media_id: row.media_id,
-        author_id: row.author_id,
-        content: row.content,
-        created_at: row.created_at,
-        author_username: isRegistered ? row.users?.username ?? null : null,
-      }));
-
-      res.json(comments);
-      return;
-    }
-
     // Demo mode
     res.json([]);
   }
@@ -646,36 +372,6 @@ apiRouter.post(
         error: 'INVALID_COMMENT',
         message: 'Потрібні поля: media_id та вміст коментаря.',
       });
-      return;
-    }
-
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
-        .from('comments')
-        .insert({
-          media_id,
-          author_id: userId,
-          content: content.trim(),
-        })
-        .select('*, users ( username )')
-        .single();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      const isRegistered = Boolean(req.viewer?.isRegistered);
-      const comment: CommentDTO = {
-        id: data.id,
-        media_id: data.media_id,
-        author_id: data.author_id,
-        content: data.content,
-        created_at: data.created_at,
-        author_username: isRegistered ? data.users?.username ?? null : null,
-      };
-
-      res.status(201).json(comment);
       return;
     }
 
@@ -709,53 +405,6 @@ apiRouter.get(
       return;
     }
 
-    if (isSupabaseConfigured) {
-      // Resolve other user by username if it looks like a username
-      let targetUserId = otherUserId;
-      if (!otherUserId.includes('-')) {
-        const { data: userData, error: userError } = await supabaseAdmin
-          .from('users')
-          .select('id')
-          .ilike('username', otherUserId)
-          .maybeSingle();
-
-        if (userError || !userData) {
-          res.status(404).json({
-            error: 'USER_NOT_FOUND',
-            message: 'Користувача не знайдено.',
-          });
-          return;
-        }
-        targetUserId = userData.id;
-      }
-
-      const { data, error } = await supabaseAdmin
-        .from('direct_messages')
-        .select('*, senders:users!sender_id ( username ), receivers:users!receiver_id ( username )')
-        .or(`and(sender_id.eq.${userId},receiver_id.eq.${targetUserId}),and(sender_id.eq.${targetUserId},receiver_id.eq.${userId})`)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      const isRegistered = Boolean(req.viewer?.isRegistered);
-      const messages = (data || []).map((row: any) => ({
-        id: row.id,
-        sender_id: row.sender_id,
-        receiver_id: row.receiver_id,
-        content: row.content,
-        is_read: row.is_read,
-        created_at: row.created_at,
-        sender_username: isRegistered ? row.senders?.username ?? null : null,
-        receiver_username: isRegistered ? row.receivers?.username ?? null : null,
-      }));
-
-      res.json(messages);
-      return;
-    }
-
     // Demo mode
     res.json([]);
   }
@@ -782,40 +431,6 @@ apiRouter.post(
         error: 'CANNOT_MESSAGE_SELF',
         message: 'Неможливо надіслати повідомлення собі.',
       });
-      return;
-    }
-
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
-        .from('direct_messages')
-        .insert({
-          sender_id: senderId,
-          receiver_id,
-          content: content.trim(),
-        })
-        .select(
-          '*, senders:users!sender_id ( username ), receivers:users!receiver_id ( username )'
-        )
-        .single();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      const isRegistered = Boolean(req.viewer?.isRegistered);
-      const message: DirectMessageDTO = {
-        id: data.id,
-        sender_id: data.sender_id,
-        receiver_id: data.receiver_id,
-        content: data.content,
-        is_read: data.is_read,
-        created_at: data.created_at,
-        sender_username: isRegistered ? data.senders?.username ?? null : null,
-        receiver_username: isRegistered ? data.receivers?.username ?? null : null,
-      };
-
-      res.status(201).json(message);
       return;
     }
 
@@ -852,40 +467,6 @@ apiRouter.post(
     const todayIso = new Date().toISOString().slice(0, 10);
     const isUnlocked = unlock_date <= todayIso;
 
-    if (isSupabaseConfigured) {
-      const { data, error }: any = await supabaseAdmin
-        .from('future_letters')
-        .insert({
-          author_id: userId,
-          location_id,
-          title,
-          content,
-          unlock_date,
-        })
-        .select('id, location_id, title, content, unlock_date, created_at, users ( username )')
-        .single();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      const isRegistered = Boolean(req.viewer?.isRegistered);
-      const letter: FutureLetterDTO = {
-        id: data.id,
-        location_id: data.location_id,
-        title: data.title,
-        content: isUnlocked ? data.content : null,
-        unlock_date: data.unlock_date,
-        is_unlocked: isUnlocked,
-        created_at: data.created_at,
-        author_username: isRegistered ? data.users?.username ?? null : null,
-      };
-
-      res.status(201).json(letter);
-      return;
-    }
-
     // Demo mode
     const created: FutureLetterDTO = {
       id: `letter-demo-${Date.now()}`,
@@ -906,59 +487,6 @@ apiRouter.post(
 apiRouter.get(
   '/spotlight',
   async (_req: AuthenticatedRequest, res: Response) => {
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
-        .from('media_items')
-        .select(
-          `
-          id,
-          location_id,
-          media_url,
-          media_type,
-          captured_date,
-          caption,
-          duration_seconds,
-          latitude,
-          longitude,
-          is_spotlight,
-          spotlight_until,
-          created_at,
-          locations!inner ( country, city, district ),
-          users ( username, role, partner_badge_label )
-        `
-        )
-        .eq('is_spotlight', true)
-        .order('spotlight_until', { ascending: false });
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      const isRegistered = Boolean(_req.viewer?.isRegistered);
-      const spotlights = (data || []).map((row: any) => ({
-        id: row.id,
-        location_id: row.location_id,
-        location: row.locations,
-        media_url: row.media_url,
-        media_type: row.media_type,
-        captured_date: row.captured_date,
-        caption: row.caption,
-        duration_seconds: row.duration_seconds,
-        latitude: row.latitude,
-        longitude: row.longitude,
-        is_spotlight: row.is_spotlight,
-        spotlight_until: row.spotlight_until,
-        created_at: row.created_at,
-        author_username: isRegistered ? row.users?.username ?? null : null,
-        author_role: isRegistered ? row.users?.role ?? null : null,
-        author_partner_badge: isRegistered ? row.users?.partner_badge_label ?? null : null,
-      }));
-
-      res.json(spotlights);
-      return;
-    }
-
     // Demo mode - return empty, spotlight items are marked in seed data
     res.json([]);
   }
@@ -980,43 +508,6 @@ apiRouter.post(
       return;
     }
 
-    if (isSupabaseConfigured) {
-      // Verify the media item belongs to the user
-      const { data: existing, error: fetchError } = await supabaseAdmin
-        .from('media_items')
-        .select('id, author_id')
-        .eq('id', media_id)
-        .maybeSingle();
-
-      if (fetchError || !existing) {
-        res.status(404).json({ error: 'MEDIA_NOT_FOUND' });
-        return;
-      }
-
-      if (existing.author_id !== userId) {
-        res.status(403).json({ error: 'NOT_MEDIA_OWNER' });
-        return;
-      }
-
-      const { data, error } = await supabaseAdmin
-        .from('media_items')
-        .update({
-          is_spotlight: true,
-          spotlight_until: spotlight_until || null,
-        })
-        .eq('id', media_id)
-        .select('id, is_spotlight, spotlight_until')
-        .single();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      res.json({ success: true, media: data });
-      return;
-    }
-
     // Demo mode
     res.json({ success: true, media: { id: media_id, is_spotlight: true, spotlight_until } });
   }
@@ -1028,32 +519,6 @@ apiRouter.get(
   requireRegisteredUser,
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.viewer!.id;
-
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
-        .from('users')
-        .select('username, partner_badge_label, role')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      if (!data) {
-        res.status(404).json({ error: 'USER_NOT_FOUND' });
-        return;
-      }
-
-      res.json({
-        username: data.username,
-        partner_badge_label: data.partner_badge_label,
-        role: data.role,
-        is_partner: Boolean(data.partner_badge_label),
-      });
-      return;
-    }
 
     // Demo mode
     res.json({
@@ -1073,79 +538,11 @@ apiRouter.post(
     const userId = req.viewer!.id;
     const { partner_badge_label } = req.body;
 
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
-        .from('users')
-        .update({ partner_badge_label: partner_badge_label || null })
-        .eq('id', userId)
-        .select('id, username, partner_badge_label')
-        .single();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      res.json({
-        success: true,
-        username: data.username,
-        partner_badge_label: data.partner_badge_label,
-      });
-      return;
-    }
-
     // Demo mode
     res.json({
       success: true,
       username: 'demo-user',
       partner_badge_label: partner_badge_label || null,
     });
-  }
-);
-
-// 16. Privacy Validation - Test endpoint for QA (Stage 7)
-// Verifies that guest users cannot see author nicknames or future letter content
-apiRouter.get(
-  '/privacy-validation',
-  async (_req: AuthenticatedRequest, res: Response) => {
-    const isRegistered = Boolean(_req.viewer?.isRegistered);
-
-    // Test media feed - author_username should be null for guests
-    const { data: mediaData } = await supabaseAdmin
-      .from('media_items')
-      .select('id, author_username, users ( username )')
-      .limit(3);
-
-    const guestSeesNickname =
-      mediaData &&
-      mediaData.some(
-        (row: any) =>
-          !isRegistered && row.users && row.users.username
-      );
-
-    // Test future letters - content should be null if not unlocked
-    const todayIso = new Date().toISOString().slice(0, 10);
-    const { data: lettersData } = await supabaseAdmin
-      .from('future_letters')
-      .select('id, unlock_date, content, is_unlocked')
-      .limit(3);
-
-    const lockedLetterContentLeaked =
-      lettersData &&
-      lettersData.some(
-        (row: any) =>
-          row.unlock_date > todayIso && row.content && row.content.length > 0
-      );
-
-    const privacyCheck = {
-      guestSeesAuthorNickname: isRegistered ? false : guestSeesNickname,
-      lockedLetterContentLeaked: lockedLetterContentLeaked || false,
-      authorFilterBlocked: true, // forbidPublicAuthorFilter middleware is active
-      passed:
-        (!isRegistered && !guestSeesNickname) || isRegistered,
-      timestamp: new Date().toISOString(),
-    };
-
-    res.json(privacyCheck);
   }
 );

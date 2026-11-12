@@ -3,12 +3,11 @@ import {
   AuthenticatedRequest,
   requireRegisteredUser,
 } from '../middleware/authPrivacy';
-import { isSupabaseConfigured, supabaseAdmin } from '../config/supabase';
 import { UserProfile } from '../types/models';
 
 export const profileRouter = Router();
 
-// In-memory store for local development when Supabase credentials are not yet configured
+// In-memory store for local development
 export const localDemoProfiles = new Map<string, UserProfile>([
   [
     'demo-user-1',
@@ -57,28 +56,7 @@ profileRouter.get('/check-username', async (req: AuthenticatedRequest, res: Resp
 
   const normalized = raw.toLowerCase();
 
-  if (isSupabaseConfigured) {
-    const { data, error } = await supabaseAdmin
-      .from('users')
-      .select('id')
-      .ilike('username', normalized)
-      .maybeSingle();
-
-    if (error) {
-      res.status(500).json({ error: error.message });
-      return;
-    }
-
-    const isTakenByOther = Boolean(data && data.id !== req.viewer?.id);
-    res.json({
-      available: !isTakenByOther,
-      reason: isTakenByOther ? 'TAKEN' : 'OK',
-      message: isTakenByOther ? 'Цей нікнейм вже зайнятий' : 'Нікнейм вільний',
-    });
-    return;
-  }
-
-  // Fallback check against local demo profiles
+  // Check against local demo profiles
   let taken = false;
   for (const [uid, prof] of localDemoProfiles.entries()) {
     if (prof.username.toLowerCase() === normalized && uid !== req.viewer?.id) {
@@ -104,27 +82,6 @@ profileRouter.get(
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.viewer!.id;
 
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabaseAdmin
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      if (!data) {
-        res.json({ profile: null, needsOnboarding: true });
-        return;
-      }
-
-      res.json({ profile: data, needsOnboarding: false });
-      return;
-    }
-
     const existing = localDemoProfiles.get(userId) || null;
     res.json({
       profile: existing,
@@ -149,42 +106,6 @@ profileRouter.post(
         error: 'INVALID_USERNAME',
         message: 'Нікнейм має містити від 3 до 32 символів (латиниця, цифри, _, ., -)',
       });
-      return;
-    }
-
-    if (isSupabaseConfigured) {
-      const { data: conflict } = await supabaseAdmin
-        .from('users')
-        .select('id')
-        .ilike('username', rawUsername)
-        .maybeSingle();
-
-      if (conflict && conflict.id !== userId) {
-        res.status(409).json({
-          error: 'USERNAME_TAKEN',
-          message: 'Цей унікальний нікнейм вже використовується іншим мешканцем.',
-        });
-        return;
-      }
-
-      const { data, error } = await supabaseAdmin
-        .from('users')
-        .upsert(
-          {
-            id: userId,
-            username: rawUsername,
-          },
-          { onConflict: 'id' }
-        )
-        .select('*')
-        .single();
-
-      if (error) {
-        res.status(500).json({ error: error.message });
-        return;
-      }
-
-      res.json({ profile: data, needsOnboarding: false });
       return;
     }
 

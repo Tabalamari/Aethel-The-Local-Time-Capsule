@@ -2,7 +2,7 @@
   "name": "aethel-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Aethel Backend API (Node.js + Express + TypeScript + Supabase)",
+  "description": "Aethel Backend API (Node.js + Express + TypeScript)",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
@@ -10,12 +10,8 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.46.1",
-    "@types/ws": "^8.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "ws": "^8.22.2"
+    "express": "^4.21.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

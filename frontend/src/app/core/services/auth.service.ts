@@ -1,7 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 
 export interface UserProfile {
@@ -29,7 +28,6 @@ const STORAGE_TOKEN_KEY = 'aethel_auth_token';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl;
-  private readonly supabase: SupabaseClient | null;
 
   readonly accessToken = signal<string | null>(localStorage.getItem(STORAGE_TOKEN_KEY));
   readonly profile = signal<UserProfile | null>(null);
@@ -43,16 +41,6 @@ export class AuthService {
   );
 
   constructor() {
-    const isRealSupabase =
-      Boolean(environment.supabaseUrl) &&
-      !environment.supabaseUrl.includes('your-project-id') &&
-      Boolean(environment.supabaseAnonKey) &&
-      environment.supabaseAnonKey !== 'your-supabase-anon-key';
-
-    this.supabase = isRealSupabase
-      ? createClient(environment.supabaseUrl, environment.supabaseAnonKey)
-      : null;
-
     if (this.accessToken()) {
       this.refreshProfile();
     }
@@ -69,13 +57,6 @@ export class AuthService {
   }
 
   async signInWithGoogle(): Promise<void> {
-    if (this.supabase) {
-      await this.supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin },
-      });
-      return;
-    }
     // Local fallback when Supabase credentials are not configured yet
     this.signInDemoNewUser();
   }
@@ -84,20 +65,6 @@ export class AuthService {
     const trimmed = email.trim();
     if (!trimmed || !trimmed.includes('@')) {
       return { sent: false, message: 'Введіть коректну електронну пошту.' };
-    }
-
-    if (this.supabase) {
-      const { error } = await this.supabase.auth.signInWithOtp({
-        email: trimmed,
-        options: { emailRedirectTo: window.location.origin },
-      });
-      if (error) {
-        return { sent: false, message: error.message };
-      }
-      return {
-        sent: true,
-        message: 'Магічне посилання для входу надіслано на вашу пошту!',
-      };
     }
 
     // Local development simulation: sign in as a new user requiring unique username onboarding
@@ -128,9 +95,6 @@ export class AuthService {
   }
 
   signOut(): void {
-    if (this.supabase) {
-      this.supabase.auth.signOut();
-    }
     localStorage.removeItem(STORAGE_TOKEN_KEY);
     this.accessToken.set(null);
     this.profile.set(null);
