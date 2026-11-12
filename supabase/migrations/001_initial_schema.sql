@@ -143,71 +143,84 @@ ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
 
 -- Users: Only authenticated users can view user profiles (Guest cannot see nicknames!)
+DROP POLICY IF EXISTS "Authenticated users can view profiles" ON public.users;
 CREATE POLICY "Authenticated users can view profiles"
     ON public.users FOR SELECT
     TO authenticated
     USING (true);
 
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.users;
 CREATE POLICY "Users can insert their own profile"
     ON public.users FOR INSERT
     TO authenticated
     WITH CHECK (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
 CREATE POLICY "Users can update their own profile"
     ON public.users FOR UPDATE
     TO authenticated
     USING (auth.uid() = id);
 
 -- Locations: Anyone can read locations, authenticated users can add new districts
+DROP POLICY IF EXISTS "Anyone can view locations" ON public.locations;
 CREATE POLICY "Anyone can view locations"
     ON public.locations FOR SELECT
     TO anon, authenticated
     USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can create locations" ON public.locations;
 CREATE POLICY "Authenticated users can create locations"
     ON public.locations FOR INSERT
     TO authenticated
     WITH CHECK (auth.uid() = created_by OR created_by IS NULL);
 
 -- Vault settings: Anyone can view countdown timers
+DROP POLICY IF EXISTS "Anyone can view vault settings" ON public.vault_settings;
 CREATE POLICY "Anyone can view vault settings"
     ON public.vault_settings FOR SELECT
     TO anon, authenticated
     USING (true);
 
 -- Media items: Anyone can view media items, only authenticated users can upload
+DROP POLICY IF EXISTS "Anyone can view media items" ON public.media_items;
 CREATE POLICY "Anyone can view media items"
     ON public.media_items FOR SELECT
     TO anon, authenticated
     USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can upload media" ON public.media_items;
 CREATE POLICY "Authenticated users can upload media"
     ON public.media_items FOR INSERT
     TO authenticated
     WITH CHECK (auth.uid() = author_id);
 
+DROP POLICY IF EXISTS "Authors can delete own media" ON public.media_items;
 CREATE POLICY "Authors can delete own media"
     ON public.media_items FOR DELETE
     TO authenticated
     USING (auth.uid() = author_id);
 
 -- Comments: Anyone can read comments, only authenticated users can post
+DROP POLICY IF EXISTS "Anyone can read comments" ON public.comments;
 CREATE POLICY "Anyone can read comments"
     ON public.comments FOR SELECT
     TO anon, authenticated
     USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can post comments" ON public.comments;
 CREATE POLICY "Authenticated users can post comments"
     ON public.comments FOR INSERT
     TO authenticated
     WITH CHECK (auth.uid() = author_id);
 
 -- Direct messages: Only sender or receiver can read/send
+DROP POLICY IF EXISTS "Participants can view direct messages" ON public.direct_messages;
 CREATE POLICY "Participants can view direct messages"
     ON public.direct_messages FOR SELECT
     TO authenticated
     USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
 
+DROP POLICY IF EXISTS "Authenticated users can send direct messages" ON public.direct_messages;
 CREATE POLICY "Authenticated users can send direct messages"
     ON public.direct_messages FOR INSERT
     TO authenticated
