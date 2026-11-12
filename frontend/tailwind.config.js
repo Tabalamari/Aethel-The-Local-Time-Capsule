@@ -12,6 +12,12 @@ module.exports = {
           gold: '#B07A3A',
           cream: '#4A4032',
           muted: '#8B7D70',
+          // Module-specific accent colors
+          upload: '#6B8BA4',    // muted blue-gray for photo upload
+          letters: '#B388AD',   // muted purple for future letters
+          audio: '#C47A6B',     // muted terracotta for sound map
+          spotlight: '#D99B52', // amber for spotlight
+          filter: '#8BA49C',    // muted sage for location filter
         },
       },
       fontFamily: {

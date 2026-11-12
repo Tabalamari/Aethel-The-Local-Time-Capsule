@@ -11,9 +11,9 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [CommonModule, FormsModule],
   template: `
     <section class="space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-aethel-border">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-aethel-letters">
         <div>
-          <span class="text-xs font-mono uppercase tracking-widest text-aethel-amber">
+          <span class="text-xs font-mono uppercase tracking-widest text-aethel-letters">
             Листи в майбутнє
           </span>
           <h2 class="text-2xl font-serif text-aethel-cream mt-1">
@@ -27,7 +27,7 @@ import { AuthService } from '../../core/services/auth.service';
           <button
             type="button"
             (click)="toggleWriteForm()"
-            class="px-4 py-2 rounded-lg bg-aethel-amber text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition"
+            class="px-4 py-2 rounded-lg bg-aethel-letters text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition"
           >
             {{ showWriteForm() ? '✕ Скасувати' : '+ Написати листа' }}
           </button>
@@ -36,14 +36,14 @@ import { AuthService } from '../../core/services/auth.service';
           <button
             type="button"
             (click)="promptGuest()"
-            class="px-4 py-2 rounded-lg border border-aethel-amber/60 text-aethel-gold font-medium text-xs hover:bg-aethel-amber hover:text-aethel-bg transition"
+            class="px-4 py-2 rounded-lg border border-aethel-letters/60 text-aethel-letters font-medium text-xs hover:bg-aethel-letters hover:text-aethel-bg transition"
           >
             + Написати (вхід)
           </button>
         </div>
       </div>
 
-      <form *ngIf="showWriteForm() && auth.isAuthenticated()" (ngSubmit)="onSubmit()" class="p-5 rounded-xl border border-aethel-border bg-aethel-surface space-y-4">
+      <form *ngIf="showWriteForm() && auth.isAuthenticated()" (ngSubmit)="onSubmit()" class="p-5 rounded-xl border border-aethel-letters bg-aethel-surface space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-mono text-aethel-muted mb-1.5">
@@ -106,12 +106,12 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
 
         <div class="flex items-center justify-between pt-2">
-          <span *ngIf="isSending()" class="text-xs font-mono text-aethel-gold">Надсилання...</span>
-          <span *ngIf="!isSending() && sendStatus()" class="text-xs font-mono text-aethel-gold">{{ sendStatus() }}</span>
+          <span *ngIf="isSending()" class="text-xs font-mono text-aethel-letters">Надсилання...</span>
+          <span *ngIf="!isSending() && sendStatus()" class="text-xs font-mono text-aethel-letters">{{ sendStatus() }}</span>
           <button
             type="submit"
             [disabled]="!canSend() || isSending()"
-            class="px-4 py-2 rounded-lg bg-aethel-amber text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40"
+            class="px-4 py-2 rounded-lg bg-aethel-letters text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40"
           >
             Запечатати листа
           </button>
@@ -126,7 +126,7 @@ import { AuthService } from '../../core/services/auth.service';
           <article
             *ngFor="let letter of letters()"
             class="p-4 rounded-xl border border-aethel-border bg-aethel-surface"
-            [class.border-aethel-amber]="!letter.is_unlocked"
+            [class.border-aethel-letters]="!letter.is_unlocked"
           >
             <div class="flex items-start justify-between gap-3 mb-2">
               <div>
@@ -141,7 +141,7 @@ import { AuthService } from '../../core/services/auth.service';
                 </p>
               </div>
               <div class="text-right">
-                <div *ngIf="!letter.is_unlocked" class="text-[10px] font-mono text-aethel-amber font-mono">
+                <div *ngIf="!letter.is_unlocked" class="text-[10px] font-mono text-aethel-letters font-mono">
                   Запечатаний до {{ letter.unlock_date }}
                 </div>
                 <div *ngIf="!letter.is_unlocked" class="text-xs text-aethel-gold tabular-nums mt-1">

@@ -23,7 +23,7 @@ interface SoundPoint {
     <section class="space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <span class="text-xs font-mono uppercase tracking-widest text-aethel-amber">
+          <span class="text-xs font-mono uppercase tracking-widest text-aethel-audio">
             Мапа звуків та спогадів
           </span>
           <h3 class="text-base font-serif text-aethel-cream mt-1">
@@ -37,7 +37,7 @@ interface SoundPoint {
           <button
             type="button"
             (click)="toggleRecord()"
-            class="px-4 py-2 rounded-lg bg-aethel-amber text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition"
+            class="px-4 py-2 rounded-lg bg-aethel-audio text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition"
           >
             {{ isRecording() ? '⏹ Зупинити запис' : '🎙 Записати звук' }}
           </button>
@@ -45,7 +45,7 @@ interface SoundPoint {
           <button
             type="button"
             (click)="promptGuest()"
-            class="px-4 py-2 rounded-lg border border-aethel-amber/60 text-aethel-gold font-medium text-xs hover:bg-aethel-amber hover:text-aethel-bg transition"
+            class="px-4 py-2 rounded-lg border border-aethel-audio/60 text-aethel-audio font-medium text-xs hover:bg-aethel-audio hover:text-aethel-bg transition"
           >
             🎙 Записати (вхід)
           </button>
@@ -70,10 +70,10 @@ interface SoundPoint {
                 (click)="selectPoint(point)"
                 class="relative flex flex-col items-center"
               >
-                <div class="w-6 h-6 rounded-full border-2 border-aethel-amber bg-aethel-surface shadow-md flex items-center justify-center text-[10px] font-bold text-aethel-amber transition hover:scale-110 hover:z-10 cursor-pointer">
+                <div class="w-6 h-6 rounded-full border-2 border-aethel-audio bg-aethel-surface shadow-md flex items-center justify-center text-[10px] font-bold text-aethel-audio transition hover:scale-110 hover:z-10 cursor-pointer">
                   🔊
                 </div>
-                <div class="absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-aethel-surface border border-aethel-border text-[10px] text-aethel-cream whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none z-20">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-aethel-surface border border-aethel-audio text-[10px] text-aethel-cream whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none z-20">
                   {{ point.title }}
                 </div>
               </button>
@@ -105,13 +105,13 @@ interface SoundPoint {
         <div class="space-y-2">
           @for (point of soundPoints(); track point.id) {
             <div
-              class="p-3 rounded-lg border border-aethel-border bg-aethel-surface cursor-pointer hover:border-aethel-amber/50 transition group"
+              class="p-3 rounded-lg border border-aethel-border bg-aethel-surface cursor-pointer hover:border-aethel-audio/50 transition group"
               (click)="selectPoint(point)"
             >
               <div class="flex items-start justify-between gap-3">
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-1">
-                    <span class="text-xs font-mono text-aethel-gold font-semibold">{{ point.title }}</span>
+                    <span class="text-xs font-mono text-aethel-audio font-semibold">{{ point.title }}</span>
                     @if (point.author) {
                       <span class="text-[10px] font-mono text-a-muted">                      {{ point.author }}</span>
                     }

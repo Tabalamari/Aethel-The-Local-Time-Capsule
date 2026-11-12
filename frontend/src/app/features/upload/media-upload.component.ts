@@ -16,10 +16,10 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <section class="p-6 rounded-xl border border-aethel-border bg-aethel-surface space-y-5">
+    <section class="p-6 rounded-xl border border-aethel-upload bg-aethel-surface space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <span class="text-xs font-mono uppercase tracking-widest text-aethel-amber">
+          <span class="text-xs font-mono uppercase tracking-widest text-aethel-upload">
             Додавання знімку
           </span>
           <h3 class="text-base font-serif text-aethel-cream mt-1">
@@ -30,7 +30,7 @@ import { AuthService } from '../../core/services/auth.service';
           <button
             type="button"
             (click)="toggleUpload()"
-            class="text-xs font-mono px-3 py-1.5 rounded border border-aethel-amber/60 text-aethel-gold hover:bg-aethel-amber hover:text-aethel-bg transition"
+            class="text-xs font-mono px-3 py-1.5 rounded border border-aethel-upload/60 text-aethel-upload hover:bg-aethel-upload hover:text-aethel-bg transition"
           >
             {{ isOpen() ? '✕ Скасувати' : '+ Завантажити медіа' }}
           </button>
@@ -38,7 +38,7 @@ import { AuthService } from '../../core/services/auth.service';
           <button
             type="button"
             (click)="promptGuest()"
-            class="text-xs font-mono px-3 py-1.5 rounded border border-aethel-amber/60 text-aethel-gold hover:bg-aethel-amber hover:text-aethel-bg transition"
+            class="text-xs font-mono px-3 py-1.5 rounded border border-aethel-upload/60 text-aethel-upload hover:bg-aethel-upload hover:text-aethel-bg transition"
           >
             + Завантажити (вхід)
           </button>
@@ -61,7 +61,7 @@ import { AuthService } from '../../core/services/auth.service';
                   class="sr-only"
                 />
                 <div
-                  class="aspect-video rounded-xl border-2 border-dashed border-aethel-border bg-aethel-bg p-4 text-center hover:border-aethel-amber/50 transition"
+                  class="aspect-video rounded-xl border-2 border-dashed border-aethel-upload bg-aethel-bg p-4 text-center hover:border-aethel-upload/50 transition"
                 >
                   @if (previewUrl()) {
                     <img
@@ -98,7 +98,7 @@ import { AuthService } from '../../core/services/auth.service';
                 [(ngModel)]="selectedLocationId"
                 name="location_id"
                 required
-                class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
+                class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-upload"
               >
                 <option value="">Оберіть район</option>
                 @for (loc of locations(); track loc.id) {
@@ -118,7 +118,7 @@ import { AuthService } from '../../core/services/auth.service';
                 [(ngModel)]="capturedDate"
                 name="captured_date"
                 required
-                class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
+                class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-upload"
               />
             </div>
           </div>
@@ -132,21 +132,21 @@ import { AuthService } from '../../core/services/auth.service';
               name="caption"
               rows="3"
               placeholder="Ранкова кава біля трамвайної колії..."
-              class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-amber"
+              class="w-full px-3 py-2 rounded-lg bg-aethel-bg border border-aethel-border text-xs text-aethel-cream focus:outline-none focus:border-aethel-upload"
             ></textarea>
           </div>
 
           <div class="flex items-center justify-between pt-2">
             @if (isUploading()) {
-              <span class="text-xs font-mono text-aethel-gold">Завантаження...</span>
+              <span class="text-xs font-mono text-aethel-upload">Завантаження...</span>
             } @else if (uploadStatus()) {
-              <span class="text-xs font-mono text-aethel-gold">{{ uploadStatus() }}</span>
+              <span class="text-xs font-mono text-aethel-upload">{{ uploadStatus() }}</span>
             }
 
             <button
               type="submit"
               [disabled]="!canUpload() || isUploading()"
-              class="px-4 py-2 rounded-lg bg-aethel-amber text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40 disabled:cursor-not-allowed"
+              class="px-4 py-2 rounded-lg bg-aethel-upload text-aethel-bg font-medium text-xs hover:bg-aethel-gold transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Зберегти знімок
             </button>
